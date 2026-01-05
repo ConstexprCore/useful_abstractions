@@ -1,5 +1,5 @@
-#ifndef CT_FIXED_STRING_H
-#define CT_FIXED_STRING_H
+#ifndef COMPTIME_FIXED_STRING_H
+#define COMPTIME_FIXED_STRING_H
 
 #include <algorithm>
 #include <array>
@@ -10,7 +10,7 @@
 #include <string_view>
 #include <type_traits>
 
-namespace ct {
+namespace comptime {
 
 // ============================================================================
 // Concepts for character types
@@ -360,6 +360,6 @@ struct string_constant {
   }
 };
 
-}  // namespace ct
+}  // namespace comptime
 
-#endif  // CT_FIXED_STRING_H
+#endif  // COMPTIME_FIXED_STRING_H

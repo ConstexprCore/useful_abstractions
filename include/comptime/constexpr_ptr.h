@@ -1,12 +1,12 @@
-#ifndef CT_CONSTEXPR_PTR_H
-#define CT_CONSTEXPR_PTR_H
+#ifndef COMPTIME_CONSTEXPR_PTR_H
+#define COMPTIME_CONSTEXPR_PTR_H
 
 #include <concepts>
 #include <cstddef>
 #include <iterator>
 #include <type_traits>
 
-namespace ct {
+namespace comptime {
 
 // ============================================================================
 // reinterpret_ptr - Constexpr-safe type-punning pointer wrapper (read-only)
@@ -332,6 +332,6 @@ concept any_reinterpret_ptr = is_reinterpret_ptr_v<std::remove_cvref_t<T>>;
 template <typename T>
 concept any_writable_ptr = is_writable_ptr_v<std::remove_cvref_t<T>>;
 
-}  // namespace ct
+}  // namespace comptime
 
-#endif  // CT_CONSTEXPR_PTR_H
+#endif  // COMPTIME_CONSTEXPR_PTR_H

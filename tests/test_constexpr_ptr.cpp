@@ -1,11 +1,11 @@
 #include <doctest/doctest.h>
-#include <ct/constexpr_ptr.h>
+#include <comptime/constexpr_ptr.h>
 
 #include <array>
 #include <cstdint>
 #include <type_traits>
 
-using namespace ct;
+using namespace comptime;
 
 // ============================================================================
 // reinterpret_ptr tests
