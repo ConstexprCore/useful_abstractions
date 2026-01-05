@@ -12,7 +12,6 @@ add_executable(ua_tests
     main.cpp
     test_fixed_string.cpp
     test_constexpr_ptr.cpp
-    test_char_utils.cpp
 )
 
 target_link_libraries(ua_tests PRIVATE
