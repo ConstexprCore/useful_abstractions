@@ -1,5 +1,5 @@
-#ifndef UA_FIXED_STRING_H
-#define UA_FIXED_STRING_H
+#ifndef CT_FIXED_STRING_H
+#define CT_FIXED_STRING_H
 
 #include <algorithm>
 #include <array>
@@ -10,7 +10,7 @@
 #include <string_view>
 #include <type_traits>
 
-namespace ua {
+namespace ct {
 
 // ============================================================================
 // Concepts for character types
@@ -360,6 +360,6 @@ struct string_constant {
   }
 };
 
-}  // namespace ua
+}  // namespace ct
 
-#endif  // UA_FIXED_STRING_H
+#endif  // CT_FIXED_STRING_H

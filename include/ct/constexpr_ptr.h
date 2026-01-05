@@ -1,12 +1,12 @@
-#ifndef UA_CONSTEXPR_PTR_H
-#define UA_CONSTEXPR_PTR_H
+#ifndef CT_CONSTEXPR_PTR_H
+#define CT_CONSTEXPR_PTR_H
 
 #include <concepts>
 #include <cstddef>
 #include <iterator>
 #include <type_traits>
 
-namespace ua {
+namespace ct {
 
 // ============================================================================
 // reinterpret_ptr - Constexpr-safe type-punning pointer wrapper (read-only)
@@ -332,6 +332,6 @@ concept any_reinterpret_ptr = is_reinterpret_ptr_v<std::remove_cvref_t<T>>;
 template <typename T>
 concept any_writable_ptr = is_writable_ptr_v<std::remove_cvref_t<T>>;
 
-}  // namespace ua
+}  // namespace ct
 
-#endif  // UA_CONSTEXPR_PTR_H
+#endif  // CT_CONSTEXPR_PTR_H

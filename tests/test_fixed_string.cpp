@@ -1,12 +1,12 @@
 #include <doctest/doctest.h>
-#include <ua/fixed_string.h>
+#include <ct/fixed_string.h>
 
 #include <string>
 #include <type_traits>
 #include <vector>
 
-using namespace ua;
-using namespace ua::literals;
+using namespace ct;
+using namespace ct::literals;
 
 // ============================================================================
 // fixed_string tests
