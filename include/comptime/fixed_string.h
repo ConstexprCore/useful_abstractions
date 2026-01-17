@@ -42,16 +42,16 @@ concept char_type = std::same_as<T, char> || std::same_as<T, wchar_t> ||
  */
 template <std::size_t N>
 struct fixed_string {
-  char data[N]{};
+  std::array<char, N> data{};
 
   constexpr fixed_string() = default;
 
   constexpr fixed_string(const char (&str)[N]) {
-    std::copy_n(str, N, data);
+    std::copy_n(str, N, data.data());
   }
 
   [[nodiscard]] constexpr std::string_view view() const noexcept {
-    return {data, N - 1};  // Exclude null terminator
+    return {data.data(), N - 1};  // Exclude null terminator
   }
 
   [[nodiscard]] static constexpr std::size_t size() noexcept { return N - 1; }
@@ -66,11 +66,11 @@ struct fixed_string {
     return data[i];
   }
 
-  [[nodiscard]] constexpr const char* c_str() const noexcept { return data; }
+  [[nodiscard]] constexpr const char* c_str() const noexcept { return data.data(); }
 
-  [[nodiscard]] constexpr const char* begin() const noexcept { return data; }
+  [[nodiscard]] constexpr const char* begin() const noexcept { return data.data(); }
   [[nodiscard]] constexpr const char* end() const noexcept {
-    return data + N - 1;
+    return data.data() + N - 1;
   }
 
   template <std::size_t M>
@@ -78,15 +78,15 @@ struct fixed_string {
     if constexpr (N != M) {
       return false;
     } else {
-      return std::equal(data, data + N, other.data);
+      return std::equal(data.begin(), data.end(), other.data.begin());
     }
   }
 
   template <std::size_t M>
   [[nodiscard]] constexpr auto operator+(const fixed_string<M>& other) const {
     fixed_string<N + M - 1> result{};
-    std::copy_n(data, N - 1, result.data);
-    std::copy_n(other.data, M, result.data + N - 1);
+    std::copy_n(data.data(), N - 1, result.data.data());
+    std::copy_n(other.data.data(), M, result.data.data() + N - 1);
     return result;
   }
 };
@@ -123,13 +123,13 @@ struct static_string {
 
   static constexpr std::endian endianness = Endian;
 
-  CharT storage[N]{};
+  std::array<CharT, N> storage{};
 
   constexpr static_string() = default;
 
   // Construct from string literal (array includes null terminator)
   constexpr explicit static_string(const CharT (&str)[N + 1]) {
-    std::copy_n(str, N, storage);
+    std::copy_n(str, N, storage.data());
   }
 
   // Construct from range
@@ -147,8 +147,8 @@ struct static_string {
   [[nodiscard]] static constexpr std::size_t length() noexcept { return N; }
   [[nodiscard]] static constexpr bool empty() noexcept { return N == 0; }
 
-  [[nodiscard]] constexpr CharT* data() noexcept { return storage; }
-  [[nodiscard]] constexpr const CharT* data() const noexcept { return storage; }
+  [[nodiscard]] constexpr CharT* data() noexcept { return storage.data(); }
+  [[nodiscard]] constexpr const CharT* data() const noexcept { return storage.data(); }
 
   [[nodiscard]] constexpr CharT& operator[](std::size_t i) noexcept {
     return storage[i];
@@ -167,27 +167,27 @@ struct static_string {
     return storage[N - 1];
   }
 
-  [[nodiscard]] constexpr iterator begin() noexcept { return storage; }
+  [[nodiscard]] constexpr iterator begin() noexcept { return storage.data(); }
   [[nodiscard]] constexpr const_iterator begin() const noexcept {
-    return storage;
+    return storage.data();
   }
   [[nodiscard]] constexpr const_iterator cbegin() const noexcept {
-    return storage;
+    return storage.data();
   }
 
-  [[nodiscard]] constexpr iterator end() noexcept { return storage + N; }
+  [[nodiscard]] constexpr iterator end() noexcept { return storage.data() + N; }
   [[nodiscard]] constexpr const_iterator end() const noexcept {
-    return storage + N;
+    return storage.data() + N;
   }
   [[nodiscard]] constexpr const_iterator cend() const noexcept {
-    return storage + N;
+    return storage.data() + N;
   }
 
   [[nodiscard]] constexpr std::span<CharT, N> span() noexcept {
-    return std::span<CharT, N>(storage);
+    return std::span<CharT, N>(storage.data(), N);
   }
   [[nodiscard]] constexpr std::span<const CharT, N> span() const noexcept {
-    return std::span<const CharT, N>(storage);
+    return std::span<const CharT, N>(storage.data(), N);
   }
 
   // Shrink to a smaller size (compile-time only)
@@ -195,7 +195,7 @@ struct static_string {
     requires(NewSize <= N)
   [[nodiscard]] constexpr auto shrink() const noexcept {
     static_string<CharT, NewSize, Endian> result{};
-    std::copy_n(storage, NewSize, result.storage);
+    std::copy_n(storage.data(), NewSize, result.storage.data());
     return result;
   }
 
@@ -216,7 +216,7 @@ struct static_string {
     if constexpr (N != M) {
       return false;
     } else {
-      return std::equal(storage, storage + N, other.storage);
+      return std::equal(storage.begin(), storage.end(), other.storage.begin());
     }
   }
 };
@@ -262,14 +262,14 @@ namespace detail {
  */
 template <char_type CharT, std::size_t N>
 struct string_literal {
-  CharT storage[N - 1];
+  std::array<CharT, N - 1> storage{};
   using type = CharT;
 
   static constexpr std::size_t size() noexcept { return N - 1; }
 
   constexpr string_literal(const CharT (&str)[N]) {
     static_assert(N >= 1, "String literal must have at least null terminator");
-    std::copy_n(str, N - 1, storage);
+    std::copy_n(str, N - 1, storage.data());
   }
 };
 
