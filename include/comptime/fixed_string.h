@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <array>
 #include <bit>
+#include <compare>
 #include <concepts>
 #include <cstddef>
 #include <span>
@@ -80,6 +81,11 @@ struct fixed_string {
     } else {
       return std::equal(data.begin(), data.end(), other.data.begin());
     }
+  }
+
+  template <std::size_t M>
+  [[nodiscard]] constexpr auto operator<=>(const fixed_string<M>& other) const {
+    return view() <=> other.view();
   }
 
   template <std::size_t M>
@@ -218,6 +224,14 @@ struct static_string {
     } else {
       return std::equal(storage.begin(), storage.end(), other.storage.begin());
     }
+  }
+
+  template <std::size_t M>
+  [[nodiscard]] constexpr auto
+  operator<=>(const static_string<CharT, M, Endian>& other) const {
+    return std::lexicographical_compare_three_way(
+        storage.begin(), storage.end(),
+        other.storage.begin(), other.storage.end());
   }
 };
 
