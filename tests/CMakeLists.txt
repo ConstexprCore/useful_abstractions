@@ -12,6 +12,10 @@ add_executable(ua_tests
     main.cpp
     test_fixed_string.cpp
     test_constexpr_ptr.cpp
+    test_constexpr_hash.cpp
+    test_type_name.cpp
+    test_utf_convert.cpp
+    test_escape_string.cpp
 )
 
 target_link_libraries(ua_tests PRIVATE
