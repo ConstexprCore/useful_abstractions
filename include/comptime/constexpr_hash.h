@@ -110,15 +110,7 @@ template <detail::char_type CharT, std::size_t N, std::endian E,
           typename SizeT = std::size_t>
 [[nodiscard]] constexpr SizeT
 fnv1a(const static_string<CharT, N, E>& str) noexcept {
-  using constants = detail::fnv1a_constants<SizeT>;
-
-  SizeT hash = constants::offset_basis;
-  for (std::size_t i = 0; i < N; ++i) {
-    auto byte = static_cast<unsigned char>(str[i]);
-    hash ^= static_cast<SizeT>(byte);
-    hash *= constants::prime;
-  }
-  return hash;
+  return fnv1a<CharT, SizeT>(std::basic_string_view<CharT>{str.data(), N});
 }
 
 // ============================================================================
@@ -227,70 +219,11 @@ inline namespace hash_literals {
  *   constexpr auto h = hasher("hello");
  */
 template <typename T>
-struct constexpr_hash;
-
-template <>
-struct constexpr_hash<std::string_view> {
-  using argument_type = std::string_view;
+struct constexpr_hash {
+  using argument_type = T;
   using result_type = std::size_t;
 
-  [[nodiscard]] constexpr std::size_t
-  operator()(std::string_view str) const noexcept {
-    return fnv1a(str);
-  }
-};
-
-template <>
-struct constexpr_hash<std::wstring_view> {
-  using argument_type = std::wstring_view;
-  using result_type = std::size_t;
-
-  [[nodiscard]] constexpr std::size_t
-  operator()(std::wstring_view str) const noexcept {
-    return fnv1a(str);
-  }
-};
-
-template <>
-struct constexpr_hash<std::u8string_view> {
-  using argument_type = std::u8string_view;
-  using result_type = std::size_t;
-
-  [[nodiscard]] constexpr std::size_t
-  operator()(std::u8string_view str) const noexcept {
-    return fnv1a(str);
-  }
-};
-
-template <>
-struct constexpr_hash<std::u16string_view> {
-  using argument_type = std::u16string_view;
-  using result_type = std::size_t;
-
-  [[nodiscard]] constexpr std::size_t
-  operator()(std::u16string_view str) const noexcept {
-    return fnv1a(str);
-  }
-};
-
-template <>
-struct constexpr_hash<std::u32string_view> {
-  using argument_type = std::u32string_view;
-  using result_type = std::size_t;
-
-  [[nodiscard]] constexpr std::size_t
-  operator()(std::u32string_view str) const noexcept {
-    return fnv1a(str);
-  }
-};
-
-template <std::size_t N>
-struct constexpr_hash<fixed_string<N>> {
-  using argument_type = fixed_string<N>;
-  using result_type = std::size_t;
-
-  [[nodiscard]] constexpr std::size_t
-  operator()(const fixed_string<N>& str) const noexcept {
+  [[nodiscard]] constexpr std::size_t operator()(const T& str) const noexcept {
     return fnv1a(str);
   }
 };

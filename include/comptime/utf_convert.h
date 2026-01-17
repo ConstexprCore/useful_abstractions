@@ -3,7 +3,6 @@
 
 #include <comptime/fixed_string.h>
 
-#include <array>
 #include <cstddef>
 #include <cstdint>
 
@@ -26,19 +25,6 @@ constexpr std::size_t utf8_seq_len(unsigned char lead) noexcept {
 // UTF-16 encoded size for a code point
 constexpr std::size_t utf16_encoded_size(char32_t cp) noexcept {
   return cp >= 0x10000 ? 2 : 1;
-}
-
-// UTF-8 encoded size for a code point
-constexpr std::size_t utf8_encoded_size(char32_t cp) noexcept {
-  if (cp < 0x80) return 1;
-  if (cp < 0x800) return 2;
-  if (cp < 0x10000) return 3;
-  return 4;
-}
-
-// Check surrogates
-constexpr bool is_high_surrogate(char16_t cu) noexcept {
-  return cu >= 0xD800 && cu <= 0xDBFF;
 }
 
 // Decode one UTF-8 code point, returns {code_point, bytes_consumed}
@@ -90,6 +76,18 @@ consteval std::size_t utf8_to_utf32_size() noexcept {
   return result;
 }
 
+// Encode a single code point to UTF-16, returns number of code units written
+constexpr std::size_t encode_utf16(char32_t cp, char16_t* out) noexcept {
+  if (cp < 0x10000) {
+    out[0] = static_cast<char16_t>(cp);
+    return 1;
+  }
+  char32_t adjusted = cp - 0x10000;
+  out[0] = static_cast<char16_t>(0xD800 | (adjusted >> 10));
+  out[1] = static_cast<char16_t>(0xDC00 | (adjusted & 0x3FF));
+  return 2;
+}
+
 }  // namespace detail
 
 // ============================================================================
@@ -118,14 +116,7 @@ consteval auto utf8_to_utf16() {
   while (in_idx < Str.size()) {
     auto [cp, consumed] = detail::decode_utf8(&Str.data[in_idx]);
     in_idx += consumed;
-
-    if (cp < 0x10000) {
-      result.storage[out_idx++] = static_cast<char16_t>(cp);
-    } else {
-      char32_t adjusted = cp - 0x10000;
-      result.storage[out_idx++] = static_cast<char16_t>(0xD800 | (adjusted >> 10));
-      result.storage[out_idx++] = static_cast<char16_t>(0xDC00 | (adjusted & 0x3FF));
-    }
+    out_idx += detail::encode_utf16(cp, &result.storage[out_idx]);
   }
 
   return result;
@@ -158,70 +149,6 @@ consteval auto utf8_to_utf32() {
 
   return result;
 }
-
-// ============================================================================
-// UTF-32 to UTF-8 conversion (using static_string input)
-// ============================================================================
-
-namespace detail {
-
-template <typename CharT, std::size_t N, std::endian E>
-consteval std::size_t utf32_to_utf8_size(const static_string<CharT, N, E>& str) noexcept {
-  static_assert(std::is_same_v<CharT, char32_t>, "Input must be char32_t");
-  std::size_t result = 0;
-  for (std::size_t i = 0; i < N; ++i) {
-    result += utf8_encoded_size(str.storage[i]);
-  }
-  return result;
-}
-
-template <typename CharT, std::size_t N, std::endian E>
-consteval std::size_t utf32_to_utf16_size(const static_string<CharT, N, E>& str) noexcept {
-  static_assert(std::is_same_v<CharT, char32_t>, "Input must be char32_t");
-  std::size_t result = 0;
-  for (std::size_t i = 0; i < N; ++i) {
-    result += utf16_encoded_size(str.storage[i]);
-  }
-  return result;
-}
-
-template <typename CharT, std::size_t N, std::endian E>
-consteval std::size_t utf16_to_utf8_size(const static_string<CharT, N, E>& str) noexcept {
-  static_assert(std::is_same_v<CharT, char16_t>, "Input must be char16_t");
-  std::size_t result = 0;
-  std::size_t i = 0;
-  while (i < N) {
-    char32_t cp;
-    if (!is_high_surrogate(str.storage[i])) {
-      cp = str.storage[i];
-      i += 1;
-    } else {
-      cp = 0x10000 + ((static_cast<char32_t>(str.storage[i]) - 0xD800) << 10) +
-           (static_cast<char32_t>(str.storage[i + 1]) - 0xDC00);
-      i += 2;
-    }
-    result += utf8_encoded_size(cp);
-  }
-  return result;
-}
-
-template <typename CharT, std::size_t N, std::endian E>
-consteval std::size_t utf16_to_utf32_size(const static_string<CharT, N, E>& str) noexcept {
-  static_assert(std::is_same_v<CharT, char16_t>, "Input must be char16_t");
-  std::size_t result = 0;
-  std::size_t i = 0;
-  while (i < N) {
-    if (is_high_surrogate(str.storage[i])) {
-      i += 2;
-    } else {
-      i += 1;
-    }
-    ++result;
-  }
-  return result;
-}
-
-}  // namespace detail
 
 // ============================================================================
 // Code point counting utilities

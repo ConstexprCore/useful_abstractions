@@ -167,9 +167,7 @@ template <typename T>
  */
 template <typename T>
 [[nodiscard]] consteval bool type_name_starts_with(std::string_view prefix) noexcept {
-  auto name = type_name<T>();
-  return name.size() >= prefix.size() &&
-         name.substr(0, prefix.size()) == prefix;
+  return type_name<T>().starts_with(prefix);
 }
 
 /**
@@ -177,9 +175,7 @@ template <typename T>
  */
 template <typename T>
 [[nodiscard]] consteval bool type_name_ends_with(std::string_view suffix) noexcept {
-  auto name = type_name<T>();
-  return name.size() >= suffix.size() &&
-         name.substr(name.size() - suffix.size()) == suffix;
+  return type_name<T>().ends_with(suffix);
 }
 
 // ============================================================================

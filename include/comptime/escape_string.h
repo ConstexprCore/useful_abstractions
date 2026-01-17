@@ -13,22 +13,74 @@ namespace comptime {
 
 namespace detail {
 
-// JSON escape requirements
-constexpr bool needs_json_escape(char c) noexcept {
-  return c == '"' || c == '\\' || c == '\b' || c == '\f' || c == '\n' ||
-         c == '\r' || c == '\t' || (static_cast<unsigned char>(c) < 0x20);
+// Hex digit conversion
+constexpr char to_hex_digit(unsigned char nibble) noexcept {
+  return nibble < 10 ? ('0' + nibble) : ('a' + nibble - 10);
 }
 
 // JSON escape output size for a single character
-constexpr std::size_t json_escape_size(char c) noexcept {
-  if (c == '"' || c == '\\' || c == '\b' || c == '\f' || c == '\n' ||
-      c == '\r' || c == '\t') {
-    return 2;  // Backslash + escape char
+constexpr std::size_t json_char_escape_size(char c) noexcept {
+  switch (c) {
+    case '"':
+    case '\\':
+    case '\b':
+    case '\f':
+    case '\n':
+    case '\r':
+    case '\t':
+      return 2;
+    default:
+      if (static_cast<unsigned char>(c) < 0x20) {
+        return 6;  // \uXXXX
+      }
+      return 1;
   }
-  if (static_cast<unsigned char>(c) < 0x20) {
-    return 6;  // \uXXXX
+}
+
+// Write a JSON-escaped character, returns number of chars written
+constexpr std::size_t write_json_escaped_char(char c, char* out) noexcept {
+  switch (c) {
+    case '"':
+      out[0] = '\\';
+      out[1] = '"';
+      return 2;
+    case '\\':
+      out[0] = '\\';
+      out[1] = '\\';
+      return 2;
+    case '\b':
+      out[0] = '\\';
+      out[1] = 'b';
+      return 2;
+    case '\f':
+      out[0] = '\\';
+      out[1] = 'f';
+      return 2;
+    case '\n':
+      out[0] = '\\';
+      out[1] = 'n';
+      return 2;
+    case '\r':
+      out[0] = '\\';
+      out[1] = 'r';
+      return 2;
+    case '\t':
+      out[0] = '\\';
+      out[1] = 't';
+      return 2;
+    default:
+      if (static_cast<unsigned char>(c) < 0x20) {
+        out[0] = '\\';
+        out[1] = 'u';
+        out[2] = '0';
+        out[3] = '0';
+        out[4] = to_hex_digit((c >> 4) & 0x0F);
+        out[5] = to_hex_digit(c & 0x0F);
+        return 6;
+      }
+      out[0] = c;
+      return 1;
   }
-  return 1;  // No escape needed
 }
 
 // Calculate total JSON escaped size
@@ -36,7 +88,7 @@ template <fixed_string Str>
 consteval std::size_t json_escape_output_size() noexcept {
   std::size_t result = 0;
   for (std::size_t i = 0; i < Str.size(); ++i) {
-    result += json_escape_size(Str.data[i]);
+    result += json_char_escape_size(Str.data[i]);
   }
   return result;
 }
@@ -44,12 +96,7 @@ consteval std::size_t json_escape_output_size() noexcept {
 // Calculate JSON quoted size (with surrounding quotes)
 template <fixed_string Str>
 consteval std::size_t json_quoted_output_size() noexcept {
-  return 2 + json_escape_output_size<Str>();  // 2 for the quotes
-}
-
-// Hex digit conversion
-constexpr char to_hex_digit(unsigned char nibble) noexcept {
-  return nibble < 10 ? ('0' + nibble) : ('a' + nibble - 10);
+  return 2 + json_escape_output_size<Str>();
 }
 
 // Percent encoding requirements (URL encoding)
@@ -99,51 +146,7 @@ consteval auto json_escape() {
   std::size_t out_idx = 0;
 
   for (std::size_t i = 0; i < Str.size(); ++i) {
-    char c = Str.data[i];
-
-    switch (c) {
-      case '"':
-        result.storage[out_idx++] = '\\';
-        result.storage[out_idx++] = '"';
-        break;
-      case '\\':
-        result.storage[out_idx++] = '\\';
-        result.storage[out_idx++] = '\\';
-        break;
-      case '\b':
-        result.storage[out_idx++] = '\\';
-        result.storage[out_idx++] = 'b';
-        break;
-      case '\f':
-        result.storage[out_idx++] = '\\';
-        result.storage[out_idx++] = 'f';
-        break;
-      case '\n':
-        result.storage[out_idx++] = '\\';
-        result.storage[out_idx++] = 'n';
-        break;
-      case '\r':
-        result.storage[out_idx++] = '\\';
-        result.storage[out_idx++] = 'r';
-        break;
-      case '\t':
-        result.storage[out_idx++] = '\\';
-        result.storage[out_idx++] = 't';
-        break;
-      default:
-        if (static_cast<unsigned char>(c) < 0x20) {
-          // Control character -> \uXXXX
-          result.storage[out_idx++] = '\\';
-          result.storage[out_idx++] = 'u';
-          result.storage[out_idx++] = '0';
-          result.storage[out_idx++] = '0';
-          result.storage[out_idx++] = detail::to_hex_digit((c >> 4) & 0x0F);
-          result.storage[out_idx++] = detail::to_hex_digit(c & 0x0F);
-        } else {
-          result.storage[out_idx++] = c;
-        }
-        break;
-    }
+    out_idx += detail::write_json_escaped_char(Str.data[i], &result.storage[out_idx]);
   }
 
   return result;
@@ -165,58 +168,10 @@ consteval auto json_quoted() {
   static_string<char, output_len> result{};
   std::size_t out_idx = 0;
 
-  // Opening quote
   result.storage[out_idx++] = '"';
-
-  // Escaped content
   for (std::size_t i = 0; i < Str.size(); ++i) {
-    char c = Str.data[i];
-
-    switch (c) {
-      case '"':
-        result.storage[out_idx++] = '\\';
-        result.storage[out_idx++] = '"';
-        break;
-      case '\\':
-        result.storage[out_idx++] = '\\';
-        result.storage[out_idx++] = '\\';
-        break;
-      case '\b':
-        result.storage[out_idx++] = '\\';
-        result.storage[out_idx++] = 'b';
-        break;
-      case '\f':
-        result.storage[out_idx++] = '\\';
-        result.storage[out_idx++] = 'f';
-        break;
-      case '\n':
-        result.storage[out_idx++] = '\\';
-        result.storage[out_idx++] = 'n';
-        break;
-      case '\r':
-        result.storage[out_idx++] = '\\';
-        result.storage[out_idx++] = 'r';
-        break;
-      case '\t':
-        result.storage[out_idx++] = '\\';
-        result.storage[out_idx++] = 't';
-        break;
-      default:
-        if (static_cast<unsigned char>(c) < 0x20) {
-          result.storage[out_idx++] = '\\';
-          result.storage[out_idx++] = 'u';
-          result.storage[out_idx++] = '0';
-          result.storage[out_idx++] = '0';
-          result.storage[out_idx++] = detail::to_hex_digit((c >> 4) & 0x0F);
-          result.storage[out_idx++] = detail::to_hex_digit(c & 0x0F);
-        } else {
-          result.storage[out_idx++] = c;
-        }
-        break;
-    }
+    out_idx += detail::write_json_escaped_char(Str.data[i], &result.storage[out_idx]);
   }
-
-  // Closing quote
   result.storage[out_idx++] = '"';
 
   return result;
