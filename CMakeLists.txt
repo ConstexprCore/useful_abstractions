@@ -11,6 +11,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 # Library target (header-only)
 add_library(useful_abstractions INTERFACE)
+add_library(ConstexprCore::useful_abstractions ALIAS useful_abstractions)
 target_include_directories(useful_abstractions INTERFACE
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include>
