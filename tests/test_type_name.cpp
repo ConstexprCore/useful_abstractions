@@ -1,11 +1,11 @@
 #include <doctest/doctest.h>
-#include <comptime/type_name.h>
+#include <ConstexprCore/type_name.h>
 
 #include <string>
 #include <vector>
 #include <map>
 
-using namespace comptime;
+using namespace ConstexprCore;
 
 // ============================================================================
 // type_name tests

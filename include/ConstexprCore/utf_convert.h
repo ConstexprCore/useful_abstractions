@@ -1,12 +1,12 @@
-#ifndef COMPTIME_UTF_CONVERT_H
-#define COMPTIME_UTF_CONVERT_H
+#ifndef CONSTEXPRCORE_UTF_CONVERT_H
+#define CONSTEXPRCORE_UTF_CONVERT_H
 
-#include <comptime/fixed_string.h>
+#include <ConstexprCore/fixed_string.h>
 
 #include <cstddef>
 #include <cstdint>
 
-namespace comptime {
+namespace ConstexprCore {
 
 // ============================================================================
 // Compile-time UTF conversion utilities
@@ -241,6 +241,6 @@ consteval bool is_valid_utf8() noexcept {
   return true;
 }
 
-}  // namespace comptime
+}  // namespace ConstexprCore
 
-#endif  // COMPTIME_UTF_CONVERT_H
+#endif  // CONSTEXPRCORE_UTF_CONVERT_H

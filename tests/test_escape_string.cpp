@@ -1,9 +1,9 @@
 #include <doctest/doctest.h>
-#include <comptime/escape_string.h>
+#include <ConstexprCore/escape_string.h>
 
 #include <string_view>
 
-using namespace comptime;
+using namespace ConstexprCore;
 
 // Helper to get string_view from fixed_string<char, N>
 template <std::size_t N>

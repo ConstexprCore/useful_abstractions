@@ -1,12 +1,12 @@
 #include <doctest/doctest.h>
-#include <comptime/fixed_string.h>
+#include <ConstexprCore/fixed_string.h>
 
 #include <string>
 #include <type_traits>
 #include <vector>
 
-using namespace comptime;
-using namespace comptime::literals;
+using namespace ConstexprCore;
+using namespace ConstexprCore::literals;
 
 // ============================================================================
 // fixed_string basic tests

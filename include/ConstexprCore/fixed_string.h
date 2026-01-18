@@ -1,5 +1,5 @@
-#ifndef COMPTIME_FIXED_STRING_H
-#define COMPTIME_FIXED_STRING_H
+#ifndef CONSTEXPRCORE_FIXED_STRING_H
+#define CONSTEXPRCORE_FIXED_STRING_H
 
 #include <algorithm>
 #include <array>
@@ -11,7 +11,7 @@
 #include <string_view>
 #include <type_traits>
 
-namespace comptime {
+namespace ConstexprCore {
 
 // ============================================================================
 // Concepts for character types
@@ -321,6 +321,6 @@ struct string_constant {
   }
 };
 
-}  // namespace comptime
+}  // namespace ConstexprCore
 
-#endif  // COMPTIME_FIXED_STRING_H
+#endif  // CONSTEXPRCORE_FIXED_STRING_H

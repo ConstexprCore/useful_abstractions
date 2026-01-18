@@ -1,13 +1,13 @@
-#ifndef COMPTIME_CONSTEXPR_HASH_H
-#define COMPTIME_CONSTEXPR_HASH_H
+#ifndef CONSTEXPRCORE_CONSTEXPR_HASH_H
+#define CONSTEXPRCORE_CONSTEXPR_HASH_H
 
-#include <comptime/fixed_string.h>
+#include <ConstexprCore/fixed_string.h>
 
 #include <cstddef>
 #include <cstdint>
 #include <string_view>
 
-namespace comptime {
+namespace ConstexprCore {
 
 // ============================================================================
 // FNV-1a Hash Algorithm - Compile-time string hashing
@@ -250,6 +250,6 @@ template <typename... Hashes>
   return hash_combine(hash_combine(h1, h2), rest...);
 }
 
-}  // namespace comptime
+}  // namespace ConstexprCore
 
-#endif  // COMPTIME_CONSTEXPR_HASH_H
+#endif  // CONSTEXPRCORE_CONSTEXPR_HASH_H

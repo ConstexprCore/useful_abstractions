@@ -1,13 +1,13 @@
-#ifndef COMPTIME_TYPE_NAME_H
-#define COMPTIME_TYPE_NAME_H
+#ifndef CONSTEXPRCORE_TYPE_NAME_H
+#define CONSTEXPRCORE_TYPE_NAME_H
 
-#include <comptime/constexpr_hash.h>
+#include <ConstexprCore/constexpr_hash.h>
 
 #include <array>
 #include <cstddef>
 #include <string_view>
 
-namespace comptime {
+namespace ConstexprCore {
 
 // ============================================================================
 // Compile-time type name extraction
@@ -198,6 +198,6 @@ struct named_type {
   static constexpr std::size_t id = type_id<T>;
 };
 
-}  // namespace comptime
+}  // namespace ConstexprCore
 
-#endif  // COMPTIME_TYPE_NAME_H
+#endif  // CONSTEXPRCORE_TYPE_NAME_H

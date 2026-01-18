@@ -1,11 +1,11 @@
-#ifndef COMPTIME_ESCAPE_STRING_H
-#define COMPTIME_ESCAPE_STRING_H
+#ifndef CONSTEXPRCORE_ESCAPE_STRING_H
+#define CONSTEXPRCORE_ESCAPE_STRING_H
 
-#include <comptime/fixed_string.h>
+#include <ConstexprCore/fixed_string.h>
 
 #include <cstddef>
 
-namespace comptime {
+namespace ConstexprCore {
 
 // ============================================================================
 // Compile-time string escaping utilities
@@ -352,6 +352,6 @@ consteval std::size_t html_escape_size() noexcept {
   return detail::html_escape_output_size<Str>();
 }
 
-}  // namespace comptime
+}  // namespace ConstexprCore
 
-#endif  // COMPTIME_ESCAPE_STRING_H
+#endif  // CONSTEXPRCORE_ESCAPE_STRING_H

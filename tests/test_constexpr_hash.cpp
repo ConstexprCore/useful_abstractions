@@ -1,11 +1,11 @@
 #include <doctest/doctest.h>
-#include <comptime/constexpr_hash.h>
+#include <ConstexprCore/constexpr_hash.h>
 
 #include <string>
 #include <string_view>
 
-using namespace comptime;
-using namespace comptime::literals;
+using namespace ConstexprCore;
+using namespace ConstexprCore::literals;
 
 // ============================================================================
 // fnv1a function tests

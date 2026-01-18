@@ -1,7 +1,7 @@
 #include <doctest/doctest.h>
-#include <comptime/utf_convert.h>
+#include <ConstexprCore/utf_convert.h>
 
-using namespace comptime;
+using namespace ConstexprCore;
 
 // ============================================================================
 // utf8_to_utf16 tests
