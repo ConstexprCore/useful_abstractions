@@ -269,3 +269,202 @@ TEST_SUITE("practical usage") {
     static_assert(result.size() == 5);
   }
 }
+
+// ============================================================================
+// Detailed validation tests (validate_utf8)
+// ============================================================================
+
+TEST_SUITE("validate_utf8 detailed") {
+  TEST_CASE("valid ASCII") {
+    constexpr auto result = validate_utf8<"Hello, World!">();
+
+    static_assert(result.ok());
+    static_assert(result.error == utf8_error::none);
+
+    CHECK(result.ok());
+  }
+
+  TEST_CASE("valid empty string") {
+    constexpr auto result = validate_utf8<"">();
+
+    static_assert(result.ok());
+    CHECK(result.ok());
+  }
+
+  TEST_CASE("valid multibyte sequences") {
+    // 2-byte: é (U+00E9)
+    constexpr auto r2 = validate_utf8<"\xC3\xA9">();
+    static_assert(r2.ok());
+
+    // 3-byte: € (U+20AC)
+    constexpr auto r3 = validate_utf8<"\xE2\x82\xAC">();
+    static_assert(r3.ok());
+
+    // 4-byte: 𝄞 (U+1D11E)
+    constexpr auto r4 = validate_utf8<"\xF0\x9D\x84\x9E">();
+    static_assert(r4.ok());
+
+    CHECK(r2.ok());
+    CHECK(r3.ok());
+    CHECK(r4.ok());
+  }
+
+  TEST_CASE("truncated 2-byte sequence") {
+    constexpr auto result = validate_utf8<"\xC3">();
+
+    static_assert(!result.ok());
+    static_assert(result.error == utf8_error::truncated_sequence);
+    static_assert(result.position == 0);
+
+    CHECK(!result.ok());
+    CHECK(result.error == utf8_error::truncated_sequence);
+  }
+
+  TEST_CASE("truncated 3-byte sequence") {
+    constexpr auto result = validate_utf8<"\xE2\x82">();
+
+    static_assert(!result.ok());
+    static_assert(result.error == utf8_error::truncated_sequence);
+    static_assert(result.position == 0);
+
+    CHECK(!result.ok());
+  }
+
+  TEST_CASE("truncated 4-byte sequence") {
+    constexpr auto result = validate_utf8<"\xF0\x9D\x84">();
+
+    static_assert(!result.ok());
+    static_assert(result.error == utf8_error::truncated_sequence);
+
+    CHECK(!result.ok());
+  }
+
+  TEST_CASE("invalid continuation byte") {
+    // Second byte should be 10xxxxxx but isn't
+    constexpr auto result = validate_utf8<"\xC3\x00">();
+
+    static_assert(!result.ok());
+    static_assert(result.error == utf8_error::invalid_continuation_byte);
+    static_assert(result.position == 1);
+
+    CHECK(!result.ok());
+    CHECK(result.position == 1);
+  }
+
+  TEST_CASE("overlong 2-byte encoding") {
+    // 0xC0 0x80 would encode U+0000, which should be 1 byte
+    constexpr auto result = validate_utf8<"\xC0\x80">();
+
+    static_assert(!result.ok());
+    static_assert(result.error == utf8_error::overlong_encoding);
+    static_assert(result.position == 0);
+
+    CHECK(!result.ok());
+  }
+
+  TEST_CASE("invalid lead byte (continuation as lead)") {
+    // 0x80-0xBF are continuation bytes, can't start a sequence
+    constexpr auto result = validate_utf8<"\x80">();
+
+    static_assert(!result.ok());
+    static_assert(result.error == utf8_error::invalid_lead_byte);
+    static_assert(result.position == 0);
+
+    CHECK(!result.ok());
+  }
+
+  TEST_CASE("invalid lead byte (0xFF)") {
+    constexpr auto result = validate_utf8<"\xFF">();
+
+    static_assert(!result.ok());
+    static_assert(result.error == utf8_error::invalid_lead_byte);
+
+    CHECK(!result.ok());
+  }
+
+  TEST_CASE("error position is correct") {
+    // Valid ASCII followed by invalid byte
+    constexpr auto result = validate_utf8<"abc\xFF" "def">();
+
+    static_assert(!result.ok());
+    static_assert(result.position == 3);  // Position of 0xFF
+
+    CHECK(result.position == 3);
+  }
+}
+
+// ============================================================================
+// Checked conversion tests
+// ============================================================================
+
+TEST_SUITE("checked conversions") {
+  TEST_CASE("utf8_to_utf16_checked with valid input") {
+    constexpr auto result = utf8_to_utf16_checked<"Hello">();
+
+    static_assert(result.size() == 5);
+    static_assert(result[0] == u'H');
+
+    CHECK(result.size() == 5);
+  }
+
+  TEST_CASE("utf8_to_utf32_checked with valid input") {
+    constexpr auto result = utf8_to_utf32_checked<"Hello">();
+
+    static_assert(result.size() == 5);
+    static_assert(result[0] == U'H');
+
+    CHECK(result.size() == 5);
+  }
+
+  TEST_CASE("utf8_to_utf16_checked with multibyte") {
+    // Euro sign
+    constexpr auto result = utf8_to_utf16_checked<"\xE2\x82\xAC">();
+
+    static_assert(result.size() == 1);
+    static_assert(result[0] == 0x20AC);
+
+    CHECK(result[0] == 0x20AC);
+  }
+
+  TEST_CASE("utf8_to_utf32_checked with 4-byte sequence") {
+    // Musical G clef (surrogate pair in UTF-16, single code point in UTF-32)
+    constexpr auto result = utf8_to_utf32_checked<"\xF0\x9D\x84\x9E">();
+
+    static_assert(result.size() == 1);
+    static_assert(result[0] == 0x1D11E);
+
+    CHECK(result[0] == 0x1D11E);
+  }
+
+  // Uncomment to verify compile-time error for invalid input:
+  // TEST_CASE("utf8_to_utf16_checked with invalid input") {
+  //   constexpr auto result = utf8_to_utf16_checked<"\xFF">();  // Compile error!
+  // }
+}
+
+// ============================================================================
+// require_valid_utf8 tests
+// ============================================================================
+
+TEST_SUITE("require_valid_utf8") {
+  TEST_CASE("passes for valid UTF-8") {
+    constexpr auto test = []() consteval {
+      require_valid_utf8<"Hello">();
+      require_valid_utf8<"\xE2\x82\xAC">();
+      require_valid_utf8<"\xF0\x9D\x84\x9E">();
+      return true;
+    };
+
+    static_assert(test());
+    CHECK(test());
+  }
+
+  // Uncomment to verify compile-time error:
+  // TEST_CASE("fails for invalid UTF-8") {
+  //   constexpr auto test = []() consteval {
+  //     require_valid_utf8<"\xFF">();  // Compile error here!
+  //     return true;
+  //   };
+  //   static_assert(test());
+  // }
+}
