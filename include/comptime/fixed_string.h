@@ -67,8 +67,6 @@ struct fixed_string {
     return data[i];
   }
 
-  [[nodiscard]] constexpr const char* c_str() const noexcept { return data.data(); }
-
   [[nodiscard]] constexpr const char* begin() const noexcept { return data.data(); }
   [[nodiscard]] constexpr const char* end() const noexcept {
     return data.data() + N - 1;

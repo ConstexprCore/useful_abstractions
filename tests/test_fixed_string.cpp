@@ -21,7 +21,6 @@ TEST_SUITE("fixed_string") {
     static_assert(!fs.empty());
 
     CHECK(fs.view() == "hello");
-    CHECK(fs.c_str() == std::string{"hello"});
   }
 
   TEST_CASE("empty string") {
