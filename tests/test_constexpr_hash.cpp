@@ -67,9 +67,9 @@ TEST_SUITE("fnv1a") {
     CHECK(h1 == h2);
   }
 
-  TEST_CASE("static_string overload") {
-    constexpr static_string<char, 5> ss{"hello"};
-    constexpr auto h1 = fnv1a(ss);
+  TEST_CASE("fixed_string with explicit template params") {
+    constexpr fixed_string<char, 5> fs{"hello"};
+    constexpr auto h1 = fnv1a(fs);
     constexpr auto h2 = fnv1a(std::string_view{"hello"});
 
     static_assert(h1 == h2);
@@ -278,7 +278,7 @@ TEST_SUITE("constexpr_hash functor") {
   }
 
   TEST_CASE("fixed_string hash") {
-    constexpr constexpr_hash<fixed_string<6>> hasher;
+    constexpr constexpr_hash<fixed_string<char, 5>> hasher;
     constexpr fixed_string fs{"hello"};
     constexpr auto h = hasher(fs);
 

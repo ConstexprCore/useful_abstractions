@@ -142,11 +142,11 @@ template <fixed_string Str>
 consteval auto json_escape() {
   constexpr std::size_t output_len = detail::json_escape_output_size<Str>();
 
-  static_string<char, output_len> result{};
+  fixed_string<char, output_len> result{};
   std::size_t out_idx = 0;
 
   for (std::size_t i = 0; i < Str.size(); ++i) {
-    out_idx += detail::write_json_escaped_char(Str.data[i], &result.storage[out_idx]);
+    out_idx += detail::write_json_escaped_char(Str.data[i], &result.data[out_idx]);
   }
 
   return result;
@@ -165,14 +165,14 @@ template <fixed_string Str>
 consteval auto json_quoted() {
   constexpr std::size_t output_len = detail::json_quoted_output_size<Str>();
 
-  static_string<char, output_len> result{};
+  fixed_string<char, output_len> result{};
   std::size_t out_idx = 0;
 
-  result.storage[out_idx++] = '"';
+  result.data[out_idx++] = '"';
   for (std::size_t i = 0; i < Str.size(); ++i) {
-    out_idx += detail::write_json_escaped_char(Str.data[i], &result.storage[out_idx]);
+    out_idx += detail::write_json_escaped_char(Str.data[i], &result.data[out_idx]);
   }
-  result.storage[out_idx++] = '"';
+  result.data[out_idx++] = '"';
 
   return result;
 }
@@ -195,19 +195,19 @@ template <fixed_string Str>
 consteval auto percent_encode() {
   constexpr std::size_t output_len = detail::percent_encode_output_size<Str>();
 
-  static_string<char, output_len> result{};
+  fixed_string<char, output_len> result{};
   std::size_t out_idx = 0;
 
   for (std::size_t i = 0; i < Str.size(); ++i) {
     char c = Str.data[i];
 
     if (!detail::needs_percent_encode(c)) {
-      result.storage[out_idx++] = c;
+      result.data[out_idx++] = c;
     } else {
-      result.storage[out_idx++] = '%';
-      result.storage[out_idx++] =
+      result.data[out_idx++] = '%';
+      result.data[out_idx++] =
           detail::to_hex_digit((static_cast<unsigned char>(c) >> 4) & 0x0F);
-      result.storage[out_idx++] =
+      result.data[out_idx++] =
           detail::to_hex_digit(static_cast<unsigned char>(c) & 0x0F);
     }
   }
@@ -273,7 +273,7 @@ template <fixed_string Str>
 consteval auto html_escape() {
   constexpr std::size_t output_len = detail::html_escape_output_size<Str>();
 
-  static_string<char, output_len> result{};
+  fixed_string<char, output_len> result{};
   std::size_t out_idx = 0;
 
   for (std::size_t i = 0; i < Str.size(); ++i) {
@@ -281,42 +281,42 @@ consteval auto html_escape() {
 
     switch (c) {
       case '&':
-        result.storage[out_idx++] = '&';
-        result.storage[out_idx++] = 'a';
-        result.storage[out_idx++] = 'm';
-        result.storage[out_idx++] = 'p';
-        result.storage[out_idx++] = ';';
+        result.data[out_idx++] = '&';
+        result.data[out_idx++] = 'a';
+        result.data[out_idx++] = 'm';
+        result.data[out_idx++] = 'p';
+        result.data[out_idx++] = ';';
         break;
       case '<':
-        result.storage[out_idx++] = '&';
-        result.storage[out_idx++] = 'l';
-        result.storage[out_idx++] = 't';
-        result.storage[out_idx++] = ';';
+        result.data[out_idx++] = '&';
+        result.data[out_idx++] = 'l';
+        result.data[out_idx++] = 't';
+        result.data[out_idx++] = ';';
         break;
       case '>':
-        result.storage[out_idx++] = '&';
-        result.storage[out_idx++] = 'g';
-        result.storage[out_idx++] = 't';
-        result.storage[out_idx++] = ';';
+        result.data[out_idx++] = '&';
+        result.data[out_idx++] = 'g';
+        result.data[out_idx++] = 't';
+        result.data[out_idx++] = ';';
         break;
       case '"':
-        result.storage[out_idx++] = '&';
-        result.storage[out_idx++] = 'q';
-        result.storage[out_idx++] = 'u';
-        result.storage[out_idx++] = 'o';
-        result.storage[out_idx++] = 't';
-        result.storage[out_idx++] = ';';
+        result.data[out_idx++] = '&';
+        result.data[out_idx++] = 'q';
+        result.data[out_idx++] = 'u';
+        result.data[out_idx++] = 'o';
+        result.data[out_idx++] = 't';
+        result.data[out_idx++] = ';';
         break;
       case '\'':
-        result.storage[out_idx++] = '&';
-        result.storage[out_idx++] = '#';
-        result.storage[out_idx++] = 'x';
-        result.storage[out_idx++] = '2';
-        result.storage[out_idx++] = '7';
-        result.storage[out_idx++] = ';';
+        result.data[out_idx++] = '&';
+        result.data[out_idx++] = '#';
+        result.data[out_idx++] = 'x';
+        result.data[out_idx++] = '2';
+        result.data[out_idx++] = '7';
+        result.data[out_idx++] = ';';
         break;
       default:
-        result.storage[out_idx++] = c;
+        result.data[out_idx++] = c;
         break;
     }
   }

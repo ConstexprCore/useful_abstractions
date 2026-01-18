@@ -5,10 +5,10 @@
 
 using namespace comptime;
 
-// Helper to get string_view from static_string<char, N>
+// Helper to get string_view from fixed_string<char, N>
 template <std::size_t N>
-std::string_view to_sv(const static_string<char, N>& s) {
-  return {s.data(), s.size()};
+std::string_view to_sv(const fixed_string<char, N>& s) {
+  return {s.data.data(), s.size()};
 }
 
 // ============================================================================

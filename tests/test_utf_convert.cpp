@@ -241,7 +241,7 @@ TEST_SUITE("practical usage") {
     CHECK(wide.size() == 13);
   }
 
-  TEST_CASE("static_string integration") {
+  TEST_CASE("fixed_string integration") {
     constexpr auto utf16 = utf8_to_utf16<"test">();
 
     static_assert(utf16.size() == 4);

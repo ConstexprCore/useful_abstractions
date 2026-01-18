@@ -108,7 +108,7 @@ template <fixed_string Str>
 consteval auto utf8_to_utf16() {
   constexpr std::size_t output_len = detail::utf8_to_utf16_size<Str>();
 
-  static_string<char16_t, output_len> result{};
+  fixed_string<char16_t, output_len> result{};
 
   std::size_t in_idx = 0;
   std::size_t out_idx = 0;
@@ -116,7 +116,7 @@ consteval auto utf8_to_utf16() {
   while (in_idx < Str.size()) {
     auto [cp, consumed] = detail::decode_utf8(&Str.data[in_idx]);
     in_idx += consumed;
-    out_idx += detail::encode_utf16(cp, &result.storage[out_idx]);
+    out_idx += detail::encode_utf16(cp, &result.data[out_idx]);
   }
 
   return result;
@@ -136,14 +136,14 @@ template <fixed_string Str>
 consteval auto utf8_to_utf32() {
   constexpr std::size_t output_len = detail::utf8_to_utf32_size<Str>();
 
-  static_string<char32_t, output_len> result{};
+  fixed_string<char32_t, output_len> result{};
 
   std::size_t in_idx = 0;
   std::size_t out_idx = 0;
 
   while (in_idx < Str.size()) {
     auto [cp, consumed] = detail::decode_utf8(&Str.data[in_idx]);
-    result.storage[out_idx++] = cp;
+    result.data[out_idx++] = cp;
     in_idx += consumed;
   }
 

@@ -98,19 +98,11 @@ template <typename CharT = char, typename SizeT = std::size_t>
 /**
  * Overload for fixed_string.
  */
-template <std::size_t N, typename SizeT = std::size_t>
-[[nodiscard]] constexpr SizeT fnv1a(const fixed_string<N>& str) noexcept {
-  return fnv1a<char, SizeT>(str.view());
-}
-
-/**
- * Overload for static_string.
- */
 template <detail::char_type CharT, std::size_t N, std::endian E,
           typename SizeT = std::size_t>
 [[nodiscard]] constexpr SizeT
-fnv1a(const static_string<CharT, N, E>& str) noexcept {
-  return fnv1a<CharT, SizeT>(std::basic_string_view<CharT>{str.data(), N});
+fnv1a(const fixed_string<CharT, N, E>& str) noexcept {
+  return fnv1a<CharT, SizeT>(std::basic_string_view<CharT>{str.data.data(), N});
 }
 
 // ============================================================================
