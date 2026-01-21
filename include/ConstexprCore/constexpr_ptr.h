@@ -1,6 +1,7 @@
 #ifndef CONSTEXPRCORE_CONSTEXPR_PTR_H
 #define CONSTEXPRCORE_CONSTEXPR_PTR_H
 
+#include <bit>
 #include <concepts>
 #include <cstddef>
 #include <iterator>
@@ -44,13 +45,13 @@ struct reinterpret_ptr {
 
   constexpr explicit reinterpret_ptr(const ActualT* p) noexcept : ptr(p) {}
 
-  // Dereferencing - returns value converted to ViewAs
+  // Dereferencing - returns value bit-cast to ViewAs
   [[nodiscard]] constexpr ViewAs operator*() const noexcept {
-    return static_cast<ViewAs>(*ptr);
+    return std::bit_cast<ViewAs>(*ptr);
   }
 
   [[nodiscard]] constexpr ViewAs operator[](difference_type n) const noexcept {
-    return static_cast<ViewAs>(ptr[n]);
+    return std::bit_cast<ViewAs>(ptr[n]);
   }
 
   // Increment/Decrement
@@ -162,13 +163,13 @@ struct write_proxy {
   constexpr explicit write_proxy(ActualT* p) noexcept : ptr(p) {}
 
   constexpr write_proxy& operator=(WriteAs value) noexcept {
-    *ptr = static_cast<ActualT>(value);
+    *ptr = std::bit_cast<ActualT>(value);
     return *this;
   }
 
   // Allow reading the value too
   [[nodiscard]] constexpr operator WriteAs() const noexcept {
-    return static_cast<WriteAs>(*ptr);
+    return std::bit_cast<WriteAs>(*ptr);
   }
 };
 
