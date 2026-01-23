@@ -1,5 +1,5 @@
 #include <doctest/doctest.h>
-#include <ConstexprCore/utf_convert.h>
+#include <constexprcore/utf_convert.h>
 
 using namespace ConstexprCore;
 

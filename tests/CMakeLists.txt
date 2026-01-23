@@ -17,6 +17,7 @@ add_executable(ua_tests
     test_type_name.cpp
     test_utf_convert.cpp
     test_escape_string.cpp
+    test_readme_examples.cpp
 )
 
 target_link_libraries(ua_tests PRIVATE

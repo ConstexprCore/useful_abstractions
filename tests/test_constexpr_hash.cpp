@@ -1,5 +1,5 @@
 #include <doctest/doctest.h>
-#include <ConstexprCore/constexpr_hash.h>
+#include <constexprcore/constexpr_hash.h>
 
 #include <string>
 #include <string_view>
