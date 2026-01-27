@@ -1,7 +1,7 @@
 #ifndef CONSTEXPRCORE_TYPE_NAME_H
 #define CONSTEXPRCORE_TYPE_NAME_H
 
-#include <ConstexprCore/constexpr_hash.h>
+#include <constexprcore/constexpr_hash.h>
 
 #include <array>
 #include <cstddef>
