@@ -1,8 +1,8 @@
 #ifndef CONSTEXPRCORE_UTF_CONVERT_H
 #define CONSTEXPRCORE_UTF_CONVERT_H
 
-#include <constexprcore/constexpr_check.h>
-#include <constexprcore/fixed_string.h>
+#include <ConstexprCore/constexpr_check.h>
+#include <ConstexprCore/fixed_string.h>
 
 #include <cstddef>
 #include <cstdint>

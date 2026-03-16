@@ -1,7 +1,7 @@
 #ifndef CONSTEXPRCORE_ESCAPE_STRING_H
 #define CONSTEXPRCORE_ESCAPE_STRING_H
 
-#include <constexprcore/fixed_string.h>
+#include <ConstexprCore/fixed_string.h>
 
 #include <cstddef>
 

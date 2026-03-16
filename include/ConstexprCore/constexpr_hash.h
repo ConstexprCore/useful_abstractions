@@ -1,7 +1,7 @@
 #ifndef CONSTEXPRCORE_CONSTEXPR_HASH_H
 #define CONSTEXPRCORE_CONSTEXPR_HASH_H
 
-#include <constexprcore/fixed_string.h>
+#include "ConstexprCore/fixed_string.h"
 
 #include <cstddef>
 #include <cstdint>
