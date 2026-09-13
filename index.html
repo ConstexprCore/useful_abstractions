@@ -1,0 +1,642 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>useful_abstractions — Useful Abstractions</title>
+<meta name="description" content="A header-only C++23 library of compile-time abstractions: strings you can pass as template parameters, hashing, type names, UTF conversion and escaping — all usable inside constexpr and consteval code, and all with no dependencies beyond the standard library.">
+<meta property="og:title" content="useful_abstractions — Useful Abstractions">
+<meta property="og:description" content="A header-only C++23 library of compile-time abstractions: strings you can pass as template parameters, hashing, type names, UTF conversion and escaping — all usable inside constexpr and consteval code, and all with no dependencies beyond the standard library.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://constexprcore.github.io/useful_abstractions/">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='13' font-size='13'>⚡</text></svg>">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+</head>
+<body>
+
+<div class="topbar">
+  <div class="wrap">
+    <a class="brand" href="./">ConstexprCore/useful_abstractions</a>
+    <span class="tag">v0.1.0</span>
+    <nav>
+      <a href="#what-is-in-the-box">Components</a>
+      <a href="#installing-it">Install</a>
+      <a href="#usage">Usage</a>
+      <a href="https://github.com/ConstexprCore/useful_abstractions">GitHub</a>
+    </nav>
+  </div>
+</div>
+
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <h1>Useful Abstractions</h1>
+      <p class="lede">A header-only C++23 library of compile-time abstractions: strings you can pass as template parameters, hashing, type names, UTF conversion and escaping — all usable inside constexpr and consteval code, and all with no dependencies beyond the standard library.</p>
+      <div class="cta">
+        <a class="btn btn-primary" href="https://github.com/ConstexprCore/useful_abstractions/releases/download/v0.1.0/useful_abstractions.h">Download useful_abstractions.h</a>
+        <a class="btn btn-ghost" href="https://github.com/ConstexprCore/useful_abstractions">View on GitHub</a>
+      </div>
+    </div>
+    <div class="codecard">
+      <header>
+        <span class="dot" style="background:#ff5f57"></span>
+        <span class="dot" style="background:#febc2e"></span>
+        <span class="dot" style="background:#28c840"></span>
+        <span style="margin-left:6px">main.cpp</span>
+      </header>
+      <pre><code class="language-cpp">#include &quot;useful_abstractions.h&quot;
+
+using namespace ConstexprCore;
+
+// A string literal as a template parameter.
+template &lt;fixed_string Name&gt;
+struct tagged {
+    static constexpr auto tag = Name.view();
+};
+
+// Names, hashes and escaping, all at compile time.
+static_assert(type_name&lt;double&gt;() == &quot;double&quot;);
+static_assert(fnv1a(&quot;a&quot;) != fnv1a(&quot;b&quot;));
+constexpr auto json = json_escape&lt;&quot;tab\there&quot;&gt;();</code></pre>
+    </div>
+  </div>
+</section>
+
+<section class="stats">
+  <div class="wrap">
+    <div class="stat"><div class="n">7</div><div class="l">components, usable separately</div></div>
+    <div class="stat"><div class="n">0</div><div class="l">dependencies beyond the standard library</div></div>
+    <div class="stat"><div class="n">1</div><div class="l">header to drop in (2,064 lines)</div></div>
+    <div class="stat"><div class="n">C++23</div><div class="l">header-only, consteval-first</div></div>
+  </div>
+</section>
+
+<div class="wrap layout">
+  <aside class="toc">
+    <h2>On this page</h2>
+    <ul>
+      <li class="h2"><a href="#what-is-in-the-box">What is in the box</a></li>
+      <li class="h2"><a href="#installing-it">Installing it</a></li>
+      <li class="h3"><a href="#drop-in-one-header-no-build-system-no-dependencies">Drop in one header (no build system, no dependencies)</a></li>
+      <li class="h2"><a href="#using-it-as-a-cmake-dependency">Using it as a CMake dependency</a></li>
+      <li class="h3"><a href="#fetchcontent">FetchContent</a></li>
+      <li class="h3"><a href="#find-package">find_package</a></li>
+      <li class="h3"><a href="#verifying-all-three">Verifying all three</a></li>
+      <li class="h2"><a href="#usage">Usage</a></li>
+      <li class="h3"><a href="#fixed-string-a-string-as-a-template-parameter">fixed_string — a string as a template parameter</a></li>
+      <li class="h3"><a href="#constexpr-hash-hashing-and-switch-on-strings">constexpr_hash — hashing and switch on strings</a></li>
+      <li class="h3"><a href="#type-name-type-names-and-ids-without-rtti">type_name — type names and ids without RTTI</a></li>
+      <li class="h3"><a href="#escape-string-json-url-and-html-escaping-by-the-compiler">escape_string — JSON, URL and HTML escaping by the compiler</a></li>
+      <li class="h3"><a href="#utf-convert-utf-8-validation-and-conversion-at-compile-time">utf_convert — UTF-8 validation and conversion at compile time</a></li>
+      <li class="h3"><a href="#constexpr-ptr-viewing-memory-as-another-type-in-constant-evaluation">constexpr_ptr — viewing memory as another type in constant evaluation</a></li>
+      <li class="h3"><a href="#constexpr-check-clear-compile-errors-from-consteval-code">constexpr_check — clear compile errors from consteval code</a></li>
+      <li class="h2"><a href="#building">Building</a></li>
+      <li class="h2"><a href="#contributing">Contributing</a></li>
+      <li class="h2"><a href="#license">License</a></li>
+      <li class="h2"><a href="#contact">Contact</a></li>
+    </ul>
+  </aside>
+  <main class="prose">
+<h2 id="what-is-in-the-box">What is in the box<a class="anchor" href="#what-is-in-the-box" aria-label="Link to this section">#</a></h2>
+<p>Seven components. Include the umbrella header for everything, or just the one
+you need — each header stands on its own.</p>
+<table>
+<thead>
+<tr>
+<th>Header</th>
+<th>What it gives you</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>fixed_string.h</code></td>
+<td>A string literal usable as a non-type template parameter, with the usual comparisons and <code>view()</code></td>
+</tr>
+<tr>
+<td><code>constexpr_hash.h</code></td>
+<td>FNV-1a and friends over <code>string_view</code> / <code>fixed_string</code>, at compile time</td>
+</tr>
+<tr>
+<td><code>type_name.h</code></td>
+<td><code>type_name&lt;T&gt;()</code> and a stable <code>type_id&lt;T&gt;</code>, without RTTI</td>
+</tr>
+<tr>
+<td><code>escape_string.h</code></td>
+<td>JSON escaping and percent-encoding computed in a constant expression</td>
+</tr>
+<tr>
+<td><code>utf_convert.h</code></td>
+<td>UTF-8 validation with precise error codes, and UTF-8 → UTF-16 / UTF-32 conversion of string literals at compile time</td>
+</tr>
+<tr>
+<td><code>constexpr_ptr.h</code></td>
+<td><code>reinterpret_ptr</code> / <code>writable_ptr</code>: type-punning views that work in constant evaluation, where <code>reinterpret_cast</code> cannot</td>
+</tr>
+<tr>
+<td><code>constexpr_check.h</code></td>
+<td><code>static_require</code> and <code>error_result</code>: turn a failed check inside a <code>consteval</code> function into a compiler error with your message</td>
+</tr>
+</tbody>
+</table>
+<pre><code class="language-cpp">#include &lt;ConstexprCore/useful_abstractions.h&gt;   // everything
+#include &lt;ConstexprCore/fixed_string.h&gt;          // or just one component
+</code></pre>
+<p>Requires a C++23 compiler: GCC 14+, Clang 19+ or a recent AppleClang. (Clang 18
+rejects the always-throwing <code>consteval</code> helper in <code>constexpr_check.h</code>.)</p>
+<h2 id="installing-it">Installing it<a class="anchor" href="#installing-it" aria-label="Link to this section">#</a></h2>
+<p>Three ways, in increasing order of build-system involvement.</p>
+<h3 id="drop-in-one-header-no-build-system-no-dependencies">Drop in one header (no build system, no dependencies)<a class="anchor" href="#drop-in-one-header-no-build-system-no-dependencies" aria-label="Link to this section">#</a></h3>
+<p><code>singleheader/useful_abstractions.h</code> is a self-contained amalgamation of the
+whole library. Grab it and compile:</p>
+<pre><code class="language-bash">curl -LO https://github.com/ConstexprCore/useful_abstractions/releases/download/v0.1.0/useful_abstractions.h
+</code></pre>
+<pre><code class="language-cpp">#include &quot;useful_abstractions.h&quot;
+
+using namespace ConstexprCore;
+static_assert(type_name&lt;double&gt;() == &quot;double&quot;);
+</code></pre>
+<pre><code class="language-bash">c++ -std=c++23 -O2 main.cpp -o main
+</code></pre>
+<p>To regenerate the file from a checkout:</p>
+<pre><code class="language-bash">python3 singleheader/amalgamate.py          # writes singleheader/useful_abstractions.h
+python3 singleheader/amalgamate.py --test   # ...and compiles the demo against it
+python3 singleheader/amalgamate.py --check  # CI: fail if the checked-in copy is stale
+</code></pre>
+<p>The script walks the include graph from <code>include/ConstexprCore/useful_abstractions.h</code>
+and splices each header in where it is included, leaving system includes alone.
+A CMake build also produces <code>build/singleheader/useful_abstractions.h</code> via the
+<code>useful_abstractions_singleheader</code> target.</p>
+<h2 id="using-it-as-a-cmake-dependency">Using it as a CMake dependency<a class="anchor" href="#using-it-as-a-cmake-dependency" aria-label="Link to this section">#</a></h2>
+<h3 id="fetchcontent">FetchContent<a class="anchor" href="#fetchcontent" aria-label="Link to this section">#</a></h3>
+<p>Tests switch themselves off when the library is not the top-level project, so
+there is nothing else to configure.</p>
+<pre><code class="language-cmake">include(FetchContent)
+FetchContent_Declare(
+    useful_abstractions
+    GIT_REPOSITORY https://github.com/ConstexprCore/useful_abstractions.git
+    GIT_TAG        v0.1.0
+)
+FetchContent_MakeAvailable(useful_abstractions)
+
+add_executable(my_app main.cpp)
+target_link_libraries(my_app PRIVATE ConstexprCore::useful_abstractions)
+target_compile_features(my_app PRIVATE cxx_std_23)
+</code></pre>
+<p><code>add_subdirectory(useful_abstractions)</code> on a vendored checkout works the same way.</p>
+<h3 id="find-package">find_package<a class="anchor" href="#find-package" aria-label="Link to this section">#</a></h3>
+<p>Install the project once:</p>
+<pre><code class="language-bash">cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local
+cmake --build build
+cmake --install build
+</code></pre>
+<p>then consume it from anywhere:</p>
+<pre><code class="language-cmake">find_package(useful_abstractions REQUIRED)
+
+add_executable(my_app main.cpp)
+target_link_libraries(my_app PRIVATE ConstexprCore::useful_abstractions)
+</code></pre>
+<p>The install ships the individual headers <em>and</em> the amalgamation, with the
+amalgamation placed at the umbrella path, so this works either way:</p>
+<pre><code class="language-cpp">#include &lt;ConstexprCore/useful_abstractions.h&gt;   // self-contained after install
+#include &lt;ConstexprCore/fixed_string.h&gt;          // individual components too
+</code></pre>
+<p>Add <code>-DCMAKE_PREFIX_PATH=&lt;prefix&gt;</code> when installing somewhere CMake does not
+search by default, and <code>-DUA_INSTALL=OFF</code> to suppress the install rules when
+embedding the project in a larger build.</p>
+<h3 id="verifying-all-three">Verifying all three<a class="anchor" href="#verifying-all-three" aria-label="Link to this section">#</a></h3>
+<p><code>tools/test_packaging.py</code> builds and runs a real consumer for each path:</p>
+<pre><code class="language-bash">python3 tools/test_packaging.py
+python3 tools/test_packaging.py --only dropin
+</code></pre>
+<p>The consumer projects live in <code>tests/packaging/</code>.</p>
+<h2 id="usage">Usage<a class="anchor" href="#usage" aria-label="Link to this section">#</a></h2>
+<p>One complete program per component. Every one of these is compiled and run as
+part of the test suite (<code>examples/*.cpp</code>), and the README text is copied from
+those files verbatim, so what you read here is what was tested.</p>
+<h3 id="fixed-string-a-string-as-a-template-parameter">fixed_string — a string as a template parameter<a class="anchor" href="#fixed-string-a-string-as-a-template-parameter" aria-label="Link to this section">#</a></h3>
+<p>The piece everything else builds on: a string literal that can be a non-type
+template parameter, built up and compared at compile time, and read back as a
+<code>string_view</code>.</p>
+<!-- example: examples/fixed_string.cpp -->
+
+<pre><code class="language-cpp">// fixed_string: a string you can pass as a template parameter.
+#include &lt;ConstexprCore/fixed_string.h&gt;
+
+#include &lt;cstdio&gt;
+
+using namespace ConstexprCore;
+using namespace ConstexprCore::literals;   // &quot;...&quot;_fs
+
+// A string literal as a non-type template parameter. This is what the rest
+// of the library builds on: every &lt;&quot;literal&quot;&gt; below is a fixed_string.
+template &lt;fixed_string Name&gt;
+struct field {
+    static constexpr std::string_view name = Name.view();
+    static constexpr std::size_t length = Name.size();
+};
+
+using user_id = field&lt;&quot;user_id&quot;&gt;;
+static_assert(user_id::name == &quot;user_id&quot;);
+static_assert(user_id::length == 7);
+
+// Values, not just types: build strings at compile time.
+constexpr auto prefix = &quot;api/v1/&quot;_fs;
+constexpr auto route  = prefix + &quot;users&quot;_fs;            // concatenation
+static_assert(route.view() == &quot;api/v1/users&quot;);
+static_assert(route.size() == 12);
+static_assert(route[0] == 'a' &amp;&amp; route.back() == 's');
+
+// Comparison works across different lengths, and orders lexicographically.
+static_assert(&quot;abc&quot;_fs == &quot;abc&quot;_fs);
+static_assert(&quot;abc&quot;_fs != &quot;abcd&quot;_fs);
+static_assert(&quot;abc&quot;_fs &lt; &quot;abd&quot;_fs);
+
+// Reading a fixed_string back out as a plain string_view.
+constexpr std::string_view as_view = route;             // implicit conversion
+
+int main() {
+    // A fixed_string holds exactly its characters, with no terminator: print
+    // through a string_view with a length, never with a bare %s.
+    std::printf(&quot;field   : %.*s (%zu chars)\n&quot;, int(user_id::length), user_id::name.data(), user_id::length);
+    std::printf(&quot;route   : %.*s\n&quot;, int(as_view.size()), as_view.data());
+    for (char c : &quot;abc&quot;_fs) std::printf(&quot;%c &quot;, c);       // iterable
+    std::printf(&quot;\n&quot;);
+    return route.view() == &quot;api/v1/users&quot; ? 0 : 1;
+}
+</code></pre>
+<!-- /example -->
+
+<h3 id="constexpr-hash-hashing-and-switch-on-strings">constexpr_hash — hashing and <code>switch</code> on strings<a class="anchor" href="#constexpr-hash-hashing-and-switch-on-strings" aria-label="Link to this section">#</a></h3>
+<p>FNV-1a that runs in constant expressions, so <code>case "GET"_hash:</code> is a
+compile-time constant and dispatching on a runtime string is one hash and a
+jump table.</p>
+<!-- example: examples/constexpr_hash.cpp -->
+
+<pre><code class="language-cpp">// constexpr_hash: FNV-1a hashing in constant expressions, and string switches.
+#include &lt;ConstexprCore/constexpr_hash.h&gt;
+
+#include &lt;cstdio&gt;
+#include &lt;string_view&gt;
+
+using namespace ConstexprCore;
+using namespace ConstexprCore::literals;   // &quot;...&quot;_hash
+
+// The same function hashes at compile time and at run time.
+static_assert(fnv1a(&quot;hello&quot;) == fnv1a(std::string_view{&quot;hello&quot;}));
+static_assert(fnv1a(&quot;hello&quot;) != fnv1a(&quot;world&quot;));
+static_assert(hash_v&lt;&quot;hello&quot;&gt; == fnv1a(&quot;hello&quot;));       // fixed_string form
+
+// The classic use: switch on a string. The case labels are computed by the
+// compiler; only the runtime input is hashed at run time.
+constexpr int status_for(std::string_view method) {
+    switch (fnv1a(method)) {
+        case &quot;GET&quot;_hash:    return 200;
+        case &quot;POST&quot;_hash:   return 201;
+        case &quot;DELETE&quot;_hash: return 204;
+        default:            return 405;
+    }
+}
+static_assert(status_for(&quot;GET&quot;) == 200);
+static_assert(status_for(&quot;POST&quot;) == 201);
+static_assert(status_for(&quot;BREW&quot;) == 405);
+
+// Combine hashes of several fields into one, e.g. for a composite key.
+constexpr std::size_t point_hash = hash_combine(fnv1a(&quot;x&quot;), fnv1a(&quot;y&quot;));
+static_assert(point_hash != fnv1a(&quot;x&quot;) &amp;&amp; point_hash != fnv1a(&quot;y&quot;));
+
+// A functor with the std::hash interface, usable in constant expressions.
+constexpr constexpr_hash&lt;std::string_view&gt; hasher;
+static_assert(hasher(&quot;key&quot;) == fnv1a(&quot;key&quot;));
+
+int main(int argc, char** argv) {
+    std::string_view method = argc &gt; 1 ? argv[1] : &quot;GET&quot;;
+    std::printf(&quot;%.*s -&gt; %d\n&quot;, int(method.size()), method.data(), status_for(method));
+    std::printf(&quot;fnv1a(\&quot;hello\&quot;) = %zu\n&quot;, fnv1a(&quot;hello&quot;));
+    return status_for(&quot;GET&quot;) == 200 ? 0 : 1;
+}
+</code></pre>
+<!-- /example -->
+
+<h3 id="type-name-type-names-and-ids-without-rtti">type_name — type names and ids without RTTI<a class="anchor" href="#type-name-type-names-and-ids-without-rtti" aria-label="Link to this section">#</a></h3>
+<p>The name of a type as a <code>string_view</code>, and a stable integer id derived from
+it, both usable in <code>static_assert</code> and as registry keys.</p>
+<!-- example: examples/type_name.cpp -->
+
+<pre><code class="language-cpp">// type_name: the name of a type as a compile-time string, without RTTI.
+#include &lt;ConstexprCore/type_name.h&gt;
+
+#include &lt;cstdio&gt;
+#include &lt;map&gt;
+#include &lt;string&gt;
+#include &lt;vector&gt;
+
+using namespace ConstexprCore;
+
+// Plain types come back verbatim.
+static_assert(type_name&lt;int&gt;() == &quot;int&quot;);
+static_assert(type_name&lt;double&gt;() == &quot;double&quot;);
+
+// Library types include their namespace; spell out expectations with
+// predicates rather than exact strings, since compilers format template
+// arguments differently.
+static_assert(type_name_contains&lt;std::vector&lt;int&gt;&gt;(&quot;vector&quot;));
+static_assert(type_name_starts_with&lt;std::string&gt;(&quot;std::&quot;));
+
+// A stable integer id per type: a hash of the name.
+static_assert(type_id&lt;int&gt; != type_id&lt;float&gt;);
+static_assert(type_id&lt;int&gt; == type_id&lt;int&gt;);
+static_assert(same_type_id&lt;std::vector&lt;int&gt;, std::vector&lt;int&gt;&gt;);
+
+// A registry keyed by type name, filled in at compile time.
+template &lt;typename T&gt;
+struct registered {
+    static constexpr std::string_view name = type_name&lt;T&gt;();
+    static constexpr std::size_t id = type_id&lt;T&gt;;
+};
+
+int main() {
+    // type_name() views into the compiler's function signature, so it is
+    // not NUL-terminated: print it with a length, or copy it into a string.
+    std::printf(&quot;%-24.*s id=%zu\n&quot;, int(registered&lt;int&gt;::name.size()),
+                registered&lt;int&gt;::name.data(), registered&lt;int&gt;::id);
+    std::printf(&quot;%-24s id=%zu\n&quot;, std::string(registered&lt;std::map&lt;int, int&gt;&gt;::name).c_str(),
+                registered&lt;std::map&lt;int, int&gt;&gt;::id);
+    return type_name&lt;int&gt;() == &quot;int&quot; ? 0 : 1;
+}
+</code></pre>
+<!-- /example -->
+
+<h3 id="escape-string-json-url-and-html-escaping-by-the-compiler">escape_string — JSON, URL and HTML escaping by the compiler<a class="anchor" href="#escape-string-json-url-and-html-escaping-by-the-compiler" aria-label="Link to this section">#</a></h3>
+<p>Escaped literals are computed once at compile time and sit in read-only data;
+sizes are known without materialising the result.</p>
+<!-- example: examples/escape_string.cpp -->
+
+<pre><code class="language-cpp">// escape_string: JSON, URL and HTML escaping done by the compiler.
+#include &lt;ConstexprCore/escape_string.h&gt;
+
+#include &lt;cstdio&gt;
+#include &lt;string&gt;
+
+using namespace ConstexprCore;
+
+// Escaping a literal at compile time means the escaped bytes live in the
+// binary's read-only data: nothing to compute, nothing to allocate.
+constexpr auto json  = json_escape&lt;&quot;say \&quot;hi\&quot;\n&quot;&gt;();
+static_assert(json.view() == R&quot;(say \&quot;hi\&quot;\n)&quot;);
+
+constexpr auto quoted = json_quoted&lt;&quot;say \&quot;hi\&quot;&quot;&gt;();    // adds the quotes too
+static_assert(quoted.view() == R&quot;(&quot;say \&quot;hi\&quot;&quot;)&quot;);
+
+constexpr auto url = percent_encode&lt;&quot;Hello World!&quot;&gt;();
+static_assert(url.view() == &quot;Hello%20World%21&quot;);
+
+constexpr auto html = html_escape&lt;&quot;&lt;b&gt;&amp;&lt;/b&gt;&quot;&gt;();
+static_assert(html.view() == &quot;&amp;lt;b&amp;gt;&amp;amp;&amp;lt;/b&amp;gt;&quot;);
+
+// Sizes are available without materialising the result.
+static_assert(json_escape_size&lt;&quot;say \&quot;hi\&quot;\n&quot;&gt;() == json.size());
+
+// Composing at compile time: a URL with an encoded query.
+constexpr auto query = &quot;https://example.com/search?q=&quot;_fs + percent_encode&lt;&quot;c++ &amp; you&quot;&gt;();
+static_assert(query.view() == &quot;https://example.com/search?q=c%2b%2b%20%26%20you&quot;);
+
+int main() {
+    std::printf(&quot;json   : %s\n&quot;, std::string(json.view()).c_str());
+    std::printf(&quot;quoted : %s\n&quot;, std::string(quoted.view()).c_str());
+    std::printf(&quot;url    : %s\n&quot;, std::string(url.view()).c_str());
+    std::printf(&quot;html   : %s\n&quot;, std::string(html.view()).c_str());
+    std::printf(&quot;query  : %s\n&quot;, std::string(query.view()).c_str());
+    return url.view() == &quot;Hello%20World%21&quot; ? 0 : 1;
+}
+</code></pre>
+<!-- /example -->
+
+<h3 id="utf-convert-utf-8-validation-and-conversion-at-compile-time">utf_convert — UTF-8 validation and conversion at compile time<a class="anchor" href="#utf-convert-utf-8-validation-and-conversion-at-compile-time" aria-label="Link to this section">#</a></h3>
+<p>Validation that reports <em>why</em> and <em>where</em> input is invalid, and conversion of
+UTF-8 literals to UTF-16 or UTF-32 with the result sized exactly.</p>
+<!-- example: examples/utf_convert.cpp -->
+
+<pre><code class="language-cpp">// utf_convert: validate UTF-8 and convert it to UTF-16 / UTF-32 at compile time.
+#include &lt;ConstexprCore/utf_convert.h&gt;
+
+#include &lt;cstdio&gt;
+
+using namespace ConstexprCore;
+
+// &quot;€&quot; is E2 82 AC in UTF-8. Written as bytes so the source file's own
+// encoding does not matter.
+constexpr auto euro = validate_utf8&lt;&quot;Price: \xE2\x82\xAC&quot;&gt;();
+static_assert(euro.ok());
+
+// Invalid input is reported with a reason and a byte position, not a bool.
+constexpr auto bad = validate_utf8&lt;&quot;ok\xFF&quot;&gt;();
+static_assert(!bad.ok());
+static_assert(bad.error == utf8_error::invalid_lead_byte);
+static_assert(bad.position == 2);
+
+constexpr auto cut = validate_utf8&lt;&quot;\xE2\x82&quot;&gt;();          // sequence cut short
+static_assert(cut.error == utf8_error::truncated_sequence);
+
+// Conversion to UTF-16 and UTF-32. The result is a fixed_string of the
+// target character type, sized exactly.
+constexpr auto utf16 = utf8_to_utf16&lt;&quot;Price: \xE2\x82\xAC&quot;&gt;();
+static_assert(utf16.view() == u&quot;Price: €&quot;);
+static_assert(utf16.size() == 8);
+
+constexpr auto utf32 = utf8_to_utf32&lt;&quot;\xE2\x82\xAC&quot;&gt;();
+static_assert(utf32.size() == 1 &amp;&amp; utf32[0] == U'€');
+
+// Counting code points rather than bytes.
+static_assert(utf8_code_point_count&lt;&quot;Price: \xE2\x82\xAC&quot;&gt;() == 8);
+static_assert(sizeof(&quot;Price: \xE2\x82\xAC&quot;) - 1 == 10);       // bytes
+
+// The _checked variants refuse to compile on invalid input:
+//   constexpr auto oops = utf8_to_utf16_checked&lt;&quot;\xFF&quot;&gt;();   // error
+
+int main() {
+    std::printf(&quot;valid           : %s\n&quot;, euro.ok() ? &quot;yes&quot; : &quot;no&quot;);
+    std::printf(&quot;bad at position : %zu\n&quot;, bad.position);
+    std::printf(&quot;utf16 units     : %zu\n&quot;, utf16.size());
+    std::printf(&quot;code points     : %zu\n&quot;, utf8_code_point_count&lt;&quot;Price: \xE2\x82\xAC&quot;&gt;());
+    return euro.ok() &amp;&amp; !bad.ok() ? 0 : 1;
+}
+</code></pre>
+<!-- /example -->
+
+<h3 id="constexpr-ptr-viewing-memory-as-another-type-in-constant-evaluation">constexpr_ptr — viewing memory as another type in constant evaluation<a class="anchor" href="#constexpr-ptr-viewing-memory-as-another-type-in-constant-evaluation" aria-label="Link to this section">#</a></h3>
+<p><code>reinterpret_cast</code> is forbidden during constant evaluation; <code>reinterpret_ptr</code>
+and <code>writable_ptr</code> give the same byte-level view legally, via <code>bit_cast</code> per
+element, and behave as random-access iterators.</p>
+<!-- example: examples/constexpr_ptr.cpp -->
+
+<pre><code class="language-cpp">// constexpr_ptr: view memory as another type where reinterpret_cast cannot go.
+#include &lt;ConstexprCore/constexpr_ptr.h&gt;
+
+#include &lt;cstdint&gt;
+#include &lt;cstdio&gt;
+
+using namespace ConstexprCore;
+
+// reinterpret_cast is not allowed during constant evaluation. reinterpret_ptr
+// gives the same &quot;read these chars as bytes&quot; view, legally, via bit_cast on
+// each element.
+constexpr std::uint8_t checksum(const char* data, std::size_t n) {
+    reinterpret_ptr&lt;std::uint8_t, char&gt; bytes{data};
+    std::uint8_t sum = 0;
+    for (std::size_t i = 0; i &lt; n; ++i) sum = static_cast&lt;std::uint8_t&gt;(sum + bytes[i]);
+    return sum;
+}
+
+constexpr char payload[] = {'\x01', '\x02', '\xFF'};
+static_assert(checksum(payload, 3) == 2);                  // 1 + 2 + 255, mod 256
+static_assert(*reinterpret_ptr&lt;std::uint8_t, char&gt;{payload + 2} == 255);
+
+// It is a random-access iterator, so it works with algorithms and ranges.
+constexpr bool all_nonzero() {
+    auto first = make_reinterpret_ptr&lt;std::uint8_t&gt;(payload);
+    for (auto it = first; it != first + 3; ++it) if (*it == 0) return false;
+    return true;
+}
+static_assert(all_nonzero());
+
+// The writable counterpart, for building byte buffers in constexpr code.
+constexpr std::uint32_t little_endian_word() {
+    char buffer[4] = {};
+    writable_ptr&lt;std::uint8_t, char&gt; out{buffer};
+    out[0] = 0x78; out[1] = 0x56; out[2] = 0x34; out[3] = 0x12;
+    std::uint32_t word = 0;
+    reinterpret_ptr&lt;std::uint8_t, char&gt; in{buffer};
+    for (int i = 3; i &gt;= 0; --i) word = (word &lt;&lt; 8) | in[i];
+    return word;
+}
+static_assert(little_endian_word() == 0x12345678);
+
+int main() {
+    std::printf(&quot;checksum : %u\n&quot;, checksum(payload, 3));
+    std::printf(&quot;word     : 0x%08x\n&quot;, little_endian_word());
+    return checksum(payload, 3) == 2 ? 0 : 1;
+}
+</code></pre>
+<!-- /example -->
+
+<h3 id="constexpr-check-clear-compile-errors-from-consteval-code">constexpr_check — clear compile errors from <code>consteval</code> code<a class="anchor" href="#constexpr-check-clear-compile-errors-from-consteval-code" aria-label="Link to this section">#</a></h3>
+<p>Turn a failed check inside a <code>consteval</code> function into a compiler error that
+carries your message, and report validation failures with a position.</p>
+<!-- example: examples/constexpr_check.cpp -->
+
+<pre><code class="language-cpp">// constexpr_check: turn a failed check inside consteval code into a clear
+// compiler error, with your message.
+#include &lt;ConstexprCore/constexpr_check.h&gt;
+#include &lt;ConstexprCore/fixed_string.h&gt;
+
+#include &lt;cstdio&gt;
+
+using namespace ConstexprCore;
+
+// A validated value type: constructing it with bad input does not compile.
+consteval unsigned short port(unsigned value) {
+    static_require(value != 0, &quot;port 0 is reserved&quot;);
+    static_require(value &lt; 65536, &quot;port must fit in 16 bits&quot;);
+    return static_cast&lt;unsigned short&gt;(value);
+}
+constexpr auto https = port(443);
+// constexpr auto nope = port(70000);   // error: &quot;port must fit in 16 bits&quot;
+
+// Validating text, with the position of the problem reported back.
+enum class ident_error { none, empty, bad_start, bad_char };
+
+template &lt;fixed_string Str&gt;
+consteval error_result&lt;ident_error&gt; check_identifier() {
+    if (Str.size() == 0) return {ident_error::empty, 0};
+    auto ok_start = [](char c) { return c == '_' || (c &gt;= 'a' &amp;&amp; c &lt;= 'z') || (c &gt;= 'A' &amp;&amp; c &lt;= 'Z'); };
+    auto ok_rest  = [&amp;](char c) { return ok_start(c) || (c &gt;= '0' &amp;&amp; c &lt;= '9'); };
+    if (!ok_start(Str[0])) return {ident_error::bad_start, 0};
+    for (std::size_t i = 1; i &lt; Str.size(); ++i)
+        if (!ok_rest(Str[i])) return {ident_error::bad_char, i};
+    return {ident_error::none, 0};
+}
+
+static_assert(check_identifier&lt;&quot;user_id&quot;&gt;().ok());
+constexpr auto bad = check_identifier&lt;&quot;user-id&quot;&gt;();
+static_assert(bad.error == ident_error::bad_char &amp;&amp; bad.position == 4);
+
+// require_ok turns that result into a compile error when it must be valid.
+template &lt;fixed_string Str&gt;
+consteval auto identifier() {
+    require_ok(check_identifier&lt;Str&gt;(), &quot;not a valid identifier&quot;);
+    return Str;
+}
+constexpr auto name = identifier&lt;&quot;user_id&quot;&gt;();
+// constexpr auto oops = identifier&lt;&quot;user-id&quot;&gt;();   // error: &quot;not a valid identifier&quot;
+
+int main() {
+    std::printf(&quot;port  : %u\n&quot;, https);
+    std::printf(&quot;ident : %.*s\n&quot;, int(name.size()), name.view().data());   // not NUL-terminated
+    std::printf(&quot;bad   : position %zu\n&quot;, bad.position);
+    return https == 443 ? 0 : 1;
+}
+</code></pre>
+<!-- /example -->
+
+<h2 id="building">Building<a class="anchor" href="#building" aria-label="Link to this section">#</a></h2>
+<p>Requires a C++23 compiler and CMake 3.20+.</p>
+<pre><code class="language-bash">cmake -B build
+cmake --build build
+ctest --test-dir build
+</code></pre>
+<p><code>UA_BUILD_TESTS</code> and <code>UA_INSTALL</code> default to <code>ON</code> for a top-level build and
+<code>OFF</code> when the project is consumed from another CMake project.</p>
+<p>Releases are cut by the <strong>Release</strong> workflow from the Actions tab
+(<code>gh workflow run release.yml -f bump=minor</code>, or an explicit <code>version</code>): it
+bumps the version, regenerates the amalgamation, verifies the header builds
+against the standard library alone, tags, and attaches
+<code>useful_abstractions.h</code> to the GitHub release.</p>
+<h2 id="contributing">Contributing<a class="anchor" href="#contributing" aria-label="Link to this section">#</a></h2>
+<ol>
+<li>Fork the repository</li>
+<li>Create a feature branch</li>
+<li>Add tests for new functionality</li>
+<li>Ensure all tests pass</li>
+<li>Submit a pull request</li>
+</ol>
+<h2 id="license">License<a class="anchor" href="#license" aria-label="Link to this section">#</a></h2>
+<p>This project is licensed under the MIT License - see the LICENSE file for details.</p>
+<h2 id="contact">Contact<a class="anchor" href="#contact" aria-label="Link to this section">#</a></h2>
+<p>For questions or suggestions, please open an issue on GitHub.</p>
+  </main>
+</div>
+
+<footer class="site">
+  <div class="wrap">
+    <div>Apache 2.0 / MIT licensed.</div>
+    <div>Generated from README.md on 2026-09-13 · <a href="https://github.com/ConstexprCore/useful_abstractions">source</a></div>
+  </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script>
+  if (window.hljs) { hljs.highlightAll(); }
+
+  // Copy button on every code block.
+  document.querySelectorAll('pre').forEach(function (pre) {
+    var wrap = document.createElement('div');
+    wrap.className = 'copy-wrap';
+    pre.parentNode.insertBefore(wrap, pre);
+    wrap.appendChild(pre);
+
+    var button = document.createElement('button');
+    button.className = 'copy-btn';
+    button.type = 'button';
+    button.textContent = 'Copy';
+    button.addEventListener('click', function () {
+      navigator.clipboard.writeText(pre.innerText).then(function () {
+        button.textContent = 'Copied';
+        setTimeout(function () { button.textContent = 'Copy'; }, 1400);
+      });
+    });
+    wrap.appendChild(button);
+  });
+</script>
+</body>
+</html>
