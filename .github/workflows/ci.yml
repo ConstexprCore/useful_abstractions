@@ -18,10 +18,10 @@ jobs:
             os: ubuntu-24.04
             cc: gcc-14
             cxx: g++-14
-          - name: Clang 18 · Linux
+          - name: Clang 19 · Linux
             os: ubuntu-24.04
-            cc: clang-18
-            cxx: clang++-18
+            cc: clang-19
+            cxx: clang++-19
           - name: AppleClang · macOS ARM64
             os: macos-15
 
@@ -31,8 +31,13 @@ jobs:
       - name: Install compiler (Linux)
         if: runner.os == 'Linux'
         run: |
-          sudo apt-get update -q
-          sudo apt-get install -y ${{ matrix.cc }} ${{ matrix.cxx }}
+          if [[ "${{ matrix.cc }}" == clang-* ]]; then
+            # The runner image ships Clang 18; the library needs 19+.
+            wget -qO- https://apt.llvm.org/llvm.sh | sudo bash -s -- 19
+          else
+            sudo apt-get update -q
+            sudo apt-get install -y ${{ matrix.cc }} ${{ matrix.cxx }}
+          fi
 
       - name: Configure
         run: >

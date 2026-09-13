@@ -41,7 +41,8 @@ you need — each header stands on its own.
 #include <ConstexprCore/fixed_string.h>          // or just one component
 ```
 
-Requires a C++23 compiler (GCC 14+, Clang 18+, recent MSVC or AppleClang).
+Requires a C++23 compiler: GCC 14+, Clang 19+ or a recent AppleClang. (Clang 18
+rejects the always-throwing `consteval` helper in `constexpr_check.h`.)
 
 ## Installing it
 
