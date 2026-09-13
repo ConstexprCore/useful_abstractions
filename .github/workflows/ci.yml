@@ -69,6 +69,11 @@ jobs:
       - name: singleheader/useful_abstractions.h is up to date
         run: python3 singleheader/amalgamate.py --check
 
+      # The README's usage examples are copies of examples/*.cpp, which ctest
+      # builds and runs; the copy must be exact.
+      - name: README examples match the tested programs
+        run: python3 tools/sync_readme_examples.py --check
+
       - name: It compiles against nothing but the standard library
         env:
           CXX: g++-14
