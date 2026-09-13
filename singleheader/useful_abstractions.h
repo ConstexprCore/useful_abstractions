@@ -1,4 +1,4 @@
-/* auto-generated on 2026-09-13 18:21:30 -0400. Do not edit! */
+/* auto-generated on 2026-09-13 22:30:01 +0000. Do not edit! */
 /*
  * ConstexprCore useful_abstractions 0.1.0 — single-header amalgamation.
  *
