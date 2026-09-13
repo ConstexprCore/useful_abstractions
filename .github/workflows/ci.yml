@@ -1,0 +1,76 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: GCC 14 · Linux
+            os: ubuntu-24.04
+            cc: gcc-14
+            cxx: g++-14
+          - name: Clang 18 · Linux
+            os: ubuntu-24.04
+            cc: clang-18
+            cxx: clang++-18
+          - name: AppleClang · macOS ARM64
+            os: macos-15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install compiler (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y ${{ matrix.cc }} ${{ matrix.cxx }}
+
+      - name: Configure
+        run: >
+          cmake -B build -DCMAKE_BUILD_TYPE=Release
+          ${{ runner.os == 'Linux' && format('-DCMAKE_C_COMPILER={0} -DCMAKE_CXX_COMPILER={1}', matrix.cc, matrix.cxx) || '' }}
+
+      - name: Build
+        run: cmake --build build --config Release -j 4
+
+      - name: Test
+        run: ctest --test-dir build --output-on-failure
+
+  singleheader:
+    name: Single-header amalgamation
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install compiler
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y g++-14
+
+      # The release attaches the checked-in header, so it must never be stale.
+      - name: singleheader/useful_abstractions.h is up to date
+        run: python3 singleheader/amalgamate.py --check
+
+      - name: It compiles against nothing but the standard library
+        env:
+          CXX: g++-14
+        run: python3 tools/test_packaging.py --only dropin
+
+      - name: It still works as a CMake dependency
+        env:
+          CC: gcc-14
+          CXX: g++-14
+        run: python3 tools/test_packaging.py --only fetchcontent find_package

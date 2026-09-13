@@ -1,0 +1,170 @@
+name: Release
+
+# Cut a release by hand from the Actions tab (or `gh workflow run release.yml
+# -f bump=minor`, or `-f version=0.1.0` for an exact version). The job bumps the version, regenerates the single-header
+# amalgamation, updates the download URLs in README.md, commits, tags, pushes,
+# and publishes a GitHub release with singleheader/useful_abstractions.h attached.
+#
+# The attached header must build against nothing but the standard library, so
+# the job proves that before anything is pushed.
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: "Which part of the version to bump"
+        required: true
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+        default: patch
+      version:
+        description: "Release exactly this version instead (e.g. 0.1.0); overrides bump"
+        required: false
+        type: string
+        default: ""
+      dry_run:
+        description: "Report what would change and stop"
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Release (${{ inputs.version || inputs.bump }})
+    runs-on: ubuntu-24.04
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install compiler
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y g++-14
+
+      # An explicit version wins over the bump choice.
+      - name: Pick the release argument
+        id: arg
+        run: |
+          if [ -n "${{ inputs.version }}" ]; then
+            echo "arg=${{ inputs.version }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "arg=--${{ inputs.bump }}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Show what would change
+        run: python3 tools/release.py ${{ steps.arg.outputs.arg }} --dry-run
+
+      - name: Stop here (dry run)
+        if: ${{ inputs.dry_run }}
+        run: |
+          echo "Dry run requested; nothing was written, committed or pushed." >> "$GITHUB_STEP_SUMMARY"
+          exit 0
+
+      - name: Configure git identity
+        if: ${{ !inputs.dry_run }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      # Bumps CMakeLists.txt, the version header and the README download URLs,
+      # regenerates singleheader/useful_abstractions.h, then commits and tags.
+      - name: Bump version and regenerate the amalgamation
+        if: ${{ !inputs.dry_run }}
+        run: python3 tools/release.py ${{ steps.arg.outputs.arg }}
+
+      - name: Read the released version
+        if: ${{ !inputs.dry_run }}
+        id: version
+        run: echo "version=$(python3 tools/release.py --show-version)" >> "$GITHUB_OUTPUT"
+
+      # Fail closed: if the header is not self-contained, nothing gets pushed.
+      - name: Verify the amalgamation is current
+        if: ${{ !inputs.dry_run }}
+        run: python3 singleheader/amalgamate.py --check
+
+      - name: Verify the header needs only the standard library
+        if: ${{ !inputs.dry_run }}
+        env:
+          CXX: g++-14
+        run: python3 tools/test_packaging.py --only dropin
+
+      - name: Verify it still works as a CMake dependency
+        if: ${{ !inputs.dry_run }}
+        env:
+          CC: gcc-14
+          CXX: g++-14
+        run: python3 tools/test_packaging.py --only fetchcontent find_package
+
+      - name: Push the release commit and tag
+        if: ${{ !inputs.dry_run }}
+        run: |
+          git push origin HEAD:master
+          git push origin "v${{ steps.version.outputs.version }}"
+
+      - name: Publish the GitHub release
+        if: ${{ !inputs.dry_run }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          cat > release_notes.md <<EOF
+          ## Version ${VERSION}
+
+          Compile-time C++23 abstractions for immediate functions.
+
+          ### Drop-in single header
+
+          \`useful_abstractions.h\` below is the whole library, dependencies included.
+          It needs nothing but a C++23 standard library.
+
+          \`\`\`bash
+          curl -LO https://github.com/${GITHUB_REPOSITORY}/releases/download/v${VERSION}/useful_abstractions.h
+          c++ -std=c++23 -O2 main.cpp -o main
+          \`\`\`
+
+          \`\`\`cpp
+          #include "useful_abstractions.h"
+
+          static_assert(ConstexprCore::type_name<double>() == "double");
+          \`\`\`
+
+          ### CMake
+
+          \`\`\`cmake
+          include(FetchContent)
+          FetchContent_Declare(
+              useful_abstractions
+              GIT_REPOSITORY https://github.com/${GITHUB_REPOSITORY}.git
+              GIT_TAG        v${VERSION}
+          )
+          FetchContent_MakeAvailable(useful_abstractions)
+          target_link_libraries(my_app PRIVATE ConstexprCore::useful_abstractions)
+          \`\`\`
+
+          See the [README](https://github.com/${GITHUB_REPOSITORY}/blob/v${VERSION}/README.md) for \`find_package\` and other options.
+          EOF
+
+          gh release create "v${VERSION}" \
+            singleheader/useful_abstractions.h \
+            --title "Version ${VERSION}" \
+            --notes-file release_notes.md
+
+          {
+            echo "### Released v${VERSION}"
+            echo
+            echo "- tag: \`v${VERSION}\`"
+            echo "- asset: \`useful_abstractions.h\` (self-contained, standard library only)"
+            echo "- README download URLs updated to v${VERSION}"
+          } >> "$GITHUB_STEP_SUMMARY"

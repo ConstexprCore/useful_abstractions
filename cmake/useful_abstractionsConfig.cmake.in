@@ -1,0 +1,7 @@
+@PACKAGE_INIT@
+
+# useful_abstractions installs the amalgamated, self-contained header, so the
+# imported target has no dependencies of its own.
+include("${CMAKE_CURRENT_LIST_DIR}/useful_abstractionsTargets.cmake")
+
+check_required_components(useful_abstractions)

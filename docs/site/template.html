@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{TITLE}}</title>
+<meta name="description" content="{{DESCRIPTION}}">
+<meta property="og:title" content="{{TITLE}}">
+<meta property="og:description" content="{{DESCRIPTION}}">
+<meta property="og:type" content="website">
+<meta property="og:url" content="{{SITE_URL}}">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='13' font-size='13'>⚡</text></svg>">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+</head>
+<body>
+
+<div class="topbar">
+  <div class="wrap">
+    <a class="brand" href="./">ConstexprCore/useful_abstractions</a>
+    <span class="tag">v{{VERSION}}</span>
+    <nav>
+      <a href="#what-is-in-the-box">Components</a>
+      <a href="#installing-it">Install</a>
+      <a href="#usage">Usage</a>
+      <a href="{{REPO_URL}}">GitHub</a>
+    </nav>
+  </div>
+</div>
+
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <h1>{{HEADLINE}}</h1>
+      <p class="lede">{{TAGLINE}}</p>
+      <div class="cta">
+        <a class="btn btn-primary" href="{{DOWNLOAD_URL}}">Download useful_abstractions.h</a>
+        <a class="btn btn-ghost" href="{{REPO_URL}}">View on GitHub</a>
+      </div>
+    </div>
+    <div class="codecard">
+      <header>
+        <span class="dot" style="background:#ff5f57"></span>
+        <span class="dot" style="background:#febc2e"></span>
+        <span class="dot" style="background:#28c840"></span>
+        <span style="margin-left:6px">main.cpp</span>
+      </header>
+      <pre><code class="language-cpp">{{HERO_CODE}}</code></pre>
+    </div>
+  </div>
+</section>
+
+<section class="stats">
+  <div class="wrap">
+    <div class="stat"><div class="n">{{STAT_1_N}}</div><div class="l">{{STAT_1_L}}</div></div>
+    <div class="stat"><div class="n">{{STAT_2_N}}</div><div class="l">{{STAT_2_L}}</div></div>
+    <div class="stat"><div class="n">{{STAT_3_N}}</div><div class="l">{{STAT_3_L}}</div></div>
+    <div class="stat"><div class="n">{{STAT_4_N}}</div><div class="l">{{STAT_4_L}}</div></div>
+  </div>
+</section>
+
+<div class="wrap layout">
+  <aside class="toc">
+    <h2>On this page</h2>
+    <ul>
+{{TOC}}
+    </ul>
+  </aside>
+  <main class="prose">
+{{CONTENT}}
+  </main>
+</div>
+
+<footer class="site">
+  <div class="wrap">
+    <div>{{LICENSE_LINE}}</div>
+    <div>Generated from README.md on {{BUILT_ON}} · <a href="{{REPO_URL}}">source</a></div>
+  </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script>
+  if (window.hljs) { hljs.highlightAll(); }
+
+  // Copy button on every code block.
+  document.querySelectorAll('pre').forEach(function (pre) {
+    var wrap = document.createElement('div');
+    wrap.className = 'copy-wrap';
+    pre.parentNode.insertBefore(wrap, pre);
+    wrap.appendChild(pre);
+
+    var button = document.createElement('button');
+    button.className = 'copy-btn';
+    button.type = 'button';
+    button.textContent = 'Copy';
+    button.addEventListener('click', function () {
+      navigator.clipboard.writeText(pre.innerText).then(function () {
+        button.textContent = 'Copied';
+        setTimeout(function () { button.textContent = 'Copy'; }, 1400);
+      });
+    });
+    wrap.appendChild(button);
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,66 @@
+name: Pages
+
+# Builds the project page from README.md and publishes it to the `pages`
+# branch, which GitHub Pages serves at https://constexprcore.github.io/useful_abstractions/.
+#
+# The README is the single source of truth: the site is a rendering of it, so
+# the page cannot drift from the documentation.
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - README.md
+      - docs/site/**
+      - tools/build_site.py
+      - .github/workflows/pages.yml
+  workflow_dispatch:
+
+# Only one deploy at a time, and let a newer push supersede an older one.
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    name: Build and publish
+    runs-on: ubuntu-24.04
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install build dependencies
+        run: python3 -m pip install --quiet markdown
+
+      - name: Build the site
+        run: python3 tools/build_site.py --output _site
+
+      - name: Sanity-check the output
+        run: |
+          test -s _site/index.html
+          test -s _site/style.css
+          test -f _site/.nojekyll
+          grep -q "useful_abstractions" _site/index.html
+          # An unfilled template placeholder means a broken page.
+          ! grep -q "{{" _site/index.html
+
+      - name: Publish to the pages branch
+        run: |
+          cd _site
+          git init -q -b pages
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -q -m "Deploy site from ${GITHUB_SHA::7}"
+          git push -q --force \
+            "https://x-access-token:${{ github.token }}@github.com/${GITHUB_REPOSITORY}.git" \
+            pages
+          echo "Published to the pages branch from ${GITHUB_SHA::7}" >> "$GITHUB_STEP_SUMMARY"
+          echo "https://constexprcore.github.io/useful_abstractions/" >> "$GITHUB_STEP_SUMMARY"

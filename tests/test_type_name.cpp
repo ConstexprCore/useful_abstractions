@@ -1,5 +1,5 @@
 #include <doctest/doctest.h>
-#include <constexprcore/type_name.h>
+#include <ConstexprCore/type_name.h>
 
 #include <string>
 #include <vector>

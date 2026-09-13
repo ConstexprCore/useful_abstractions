@@ -1,5 +1,5 @@
 #include <doctest/doctest.h>
-#include <constexprcore/escape_string.h>
+#include <ConstexprCore/escape_string.h>
 
 #include <string_view>
 

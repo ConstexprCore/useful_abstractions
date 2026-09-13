@@ -1,5 +1,5 @@
 #include <doctest/doctest.h>
-#include <constexprcore/constexpr_ptr.h>
+#include <ConstexprCore/constexpr_ptr.h>
 
 #include <array>
 #include <cstdint>

@@ -1,7 +1,7 @@
 #include <doctest/doctest.h>
-#include <constexprcore/fixed_string.h>
-#include <constexprcore/constexpr_hash.h>
-#include <constexprcore/type_name.h>
+#include <ConstexprCore/fixed_string.h>
+#include <ConstexprCore/constexpr_hash.h>
+#include <ConstexprCore/type_name.h>
 
 #include <iostream>
 #include <string_view>

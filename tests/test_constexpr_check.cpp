@@ -1,5 +1,5 @@
 #include <doctest/doctest.h>
-#include <constexprcore/constexpr_check.h>
+#include <ConstexprCore/constexpr_check.h>
 
 using namespace ConstexprCore;
 

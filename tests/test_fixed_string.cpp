@@ -1,5 +1,5 @@
 #include <doctest/doctest.h>
-#include <constexprcore/fixed_string.h>
+#include <ConstexprCore/fixed_string.h>
 
 #include <string>
 #include <type_traits>
